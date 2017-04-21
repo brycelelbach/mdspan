@@ -1,0 +1,100 @@
+Padding should be generalized to a # of elements, not a number of rows.
+
+Update copyright notices.
+
+Add tests to default build target.
+
+Add a README.
+
+Use signed indices everywhere.
+
+Check if CMake has a portable way to do -Wall.
+
+In layouts, stepping()/padding() return a Dimensions, but stride() returns a
+single dimension and takes the rank index as an argument. Unify these
+interfaces.
+
+FIX_INCLUDES_IN_TESTS
+FIX_NEWLINES
+FORWARDING_IN_INDEXERS
+LIFT_INNER_TEMPLATE_IN_FORWARDERS
+MAKE_FORWARDERS_CONSTEXPR
+USE_TYPE_TRAIT_ALIAS_PARADIGM
+
+Indexing should be constexpr.
+
+Remove extent<> and rank<> specializations?
+
+Add _t aliases for everything.
+
+Cleanup type trait inheritance vs embedded typedef.
+
+Rewrite tests that are currently using is_convertible.
+
+All boolean traits should have the form is_*.
+
+Add a using statement to bring rank() into scope in layout mappings.
+
+Unit tests for is_dynamic and is_dynamic_strided.
+
+Unify meta template parameter names.
+
+Put meta functions into a separate namespace?
+
+Organize notes.
+
+Collect notes from SC meeting with Michael.
+
+Add wrapper for the static_assert in dims_unary_reduction.
+
+Lift the "test" parameter values (e.g. 3, 5, 9 for dims) to a parameter so it can be varied.
+
+Rewrite dynamic_extent/index_into_dynamic_dims using make_index_sequence?
+
+Add an is_dynamic function
+
+Padding indexing component probably needs to be adjusted.
+
+Make layout_mappings look like Michael's index space?
+
+Remove extra / from second buffer line in copyright notice.
+
+********************
+* John may have been right - precomputing strides has some performance benefits
+* that may matter. Investigate precomputing and caching stride calculations.
+********************
+
+Merge integer_sequence_array functionality into our integer_sequence.
+
+layout_regular_indexer static_asserts for rank and range.
+
+detail::integer_sequence is actually in the API (that's how you specify orderings), so it can't be an implementation detail.
+
+dimensions::size() may be a bad name because, unlike integer_sequence, it doesn't return the number of elements.
+
+Clean up rank/dim index terminology in layout_regular_indexer.
+
+is_dynamic_stride and operator[] in dimensions should return 0 for an empty
+dimensions (e.g. dimensions<>) or any out of bounds access. Add unit tests for this.
+
+Improve dimensions unit tests, in particular we seem to be lacking coverage for
+empty dimensions.
+
+Rename layout_regular_indexer
+
+Is the dimensions default ctor ever called? Won't the DynamicDims overload be matched instead?
+
+constexpr T not T constexpr for constexpr functions.
+
+What's the deal with {} vs () for initialization.
+
+Unify name of Indices/Integer/Idxs to Indices... indices
+
+Unify name of IdxDims/etc to DimIndices... dim_indices
+
+More perfect forwarding.
+
+Enum class index protection: Can we use enum classes to avoid using an index with a particular dimension?
+
+Construction from containers: auto ar = make_array_ref(vector)
+

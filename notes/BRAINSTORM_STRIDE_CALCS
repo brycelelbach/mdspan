@@ -1,0 +1,26 @@
+We recurse from otr[r-1] to otr[0] (unit stride) 
+
+// Layout Right
+
+stride[3] = p[3]      + s[3]                                    // otr[0]
+stride[2] = p[2]      + s[2]     d[3]            stride[3]
+stride[1] = p[1]      + s[1]     d[2]            stride[2]
+stride[0] = p[0]      + s[0]     d[1]            stride[1]      // otr[r-1]
+
+We need to rewrite the recurrence relation to recurse forward from unit stride
+to greatest stride dimension.
+
+stride[otr[0]] = p[otr[0]] + s[otr[0]]
+stride[n]      = p[n]      + s[n]      * d[otr[rto[n]-1]] * stride[otr[rto[n]-1]]
+start at n = otr[r-1], e.g. greatest stride]
+
+stride[3] =                                                 p[3] + s[3]
+stride[2] =                                 p[2] + s[2]d[3](p[3] + s[3])
+stride[1] =                 p[1] + s[1]d[2](p[2] + s[2]d[3](p[3] + s[3]))
+stride[0] = p[0] + s[0]d[1](p[1] + s[1]d[2](p[2] + s[2]d[3](p[3] + s[3])))
+
+
+stride[3] =                                                 p[3] + s[3]
+stride[2] =                                 p[2] + s[2]d[3](p[3] + s[3])
+
+stride[1] =                 p[1] + s[1]d[2](p[2] + s[2]d[3](p[3] + s[3]))

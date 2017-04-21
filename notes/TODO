@@ -1,2 +1,20 @@
-make_array_ref
-Suggested type = dims(0, 4, 5) syntax
+<span> synopsis should have its own section and stable tag, I suggest [views.span.synop] and 23.7.2
+Tags need to be updated
+Remove comparison operators in the span class definition section
+Should index_type be used in template member functions instead of ptrdiff_t?
+firstElem and lastElem should be first_elem and last_elem (or better yet, first and last)
+Throws: Nothing language for operator[]
+Last subspan() overl9oad says Count but means count
+cons vs cnstr in stable tags
+Should we add converting assignment operator
+Missing definition for dtor
+extent data member
+Can the converting constructors be noexcept?
+Why can't you default construct a span<> with a static size?
+Should the ptr "wrapping" constructors be explicit?
+In wrapping constructors, "When ptr is null pointer" is awkward
+View should not be used as a term of art
+Comparison operators noexcept?
+Redo SFINAE language for converting ctor
+Order of operands in converting ctor postconditions
+Put size() before length()

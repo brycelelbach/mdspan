@@ -1,0 +1,12 @@
+* Finish my reference implementation. Remove the T[][N][M] syntax, remove the variadic Properties parameter. Leave in Layout. Leave in dyn for now, but change it to be compatible with span<>.
+* Rename array_ref to mdspan<>.
+* Use a template alias to define a span<> type.
+* Change mdspan<> as needed to be compatible with Neil's span<> proposal.
+    * span<Type, Extent> should work exactly as it does in Neil's proposal.
+    * span<Type, Extent0, Extent1, ...> would work too as an extension of Neil's proposal.
+* Define a container which essentially consists of a vector<> + an mdspan<>. Call this mdvector<>. Here's how it fits into the bigger picture:
+    * span<> is a non-owning reference to a vector<>/array<>/T[].
+    * mdspan<> is a non-owning reference to a mdvector<>. 
+    * string_span<> is a non-owning reference to a string/char[].
+* Propose this as a Boost library. David could be the review manager.
+

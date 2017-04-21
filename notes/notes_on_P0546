@@ -1,0 +1,20 @@
+The second sentence of motivation needs to be reworded after the colon, I think,
+but I'm not 100% sure what you want to say there so I left it alone. E.g.
+
+    The current **P0122** proposal defines a single access abstraction:
+    the mapping an integral offset and simple iterator to an element reference.
+
+A question about the last sentence of "Summary of Proposed Change**:
+
+    For example the proposed changes to the ``span`` comparison operators
+    have this template parameter even though this proposal requires
+    ``sizeof...(AccessProperties) == 0``.
+
+The first time I read this I didn't understand what we meant. What you're saying
+is "this proposal requires sizeof...(AccessProperties) == 0 right now, but the
+comparison overloads take AccessProperties parameter packs so that they're
+future proof". Is this correct?
+
+I've read through everything but the diff (which I'm looking through now). Which
+revision of P0122 are these relative to?
+
