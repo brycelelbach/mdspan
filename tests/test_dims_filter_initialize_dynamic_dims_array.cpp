@@ -5,19 +5,22 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/lightweight_test.hpp>
-
 #include <mdspan>
 #include <iostream>
 
 template <typename T, std::size_t N>
-inline std::ostream& operator<<(std::ostream& os, std::array<T, N> const& a)
+inline std::ostream& operator<<(
+    std::ostream& os
+  , std::array<T, N> const& a
+    )
 {
     os << "{ ";
     for (auto const& e: a) os << e << " ";
     os << "}";
     return os;
 }
+
+#include <boost/core/lightweight_test.hpp>
 
 using std::array;
 using std::experimental::dyn;

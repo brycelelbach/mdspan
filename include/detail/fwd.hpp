@@ -8,6 +8,7 @@
 #if !defined(STD_FD8D1DFC_4745_40CA_A752_6E6AC86038D4)
 #define STD_FD8D1DFC_4745_40CA_A752_6E6AC86038D4
 
+#include <type_traits>
 #include <cstdint>
 
 namespace std { namespace experimental { namespace detail {

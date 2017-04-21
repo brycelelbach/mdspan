@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/core/lightweight_test.hpp>
-
 #include "detail/layout_mapping_regular_precomputed_strides.hpp"
+
+#include <boost/core/lightweight_test.hpp>
 
 using std::experimental::detail::layout_mapping_regular_precomputed_strides;
 
