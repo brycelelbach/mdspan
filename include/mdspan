@@ -14,6 +14,7 @@
 
 #include "detail/layout_left.hpp"
 #include "detail/layout_right.hpp"
+#include "detail/layout_regular.hpp"
 #include "detail/accessor_native.hpp"
 
 //#warning Unify Dims/Dimensions terminology

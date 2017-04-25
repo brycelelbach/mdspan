@@ -437,9 +437,20 @@ template <
     >
 struct layout_mapping_regular_base;
 
+///////////////////////////////////////////////////////////////////////////////
+
+struct make_regular_ordering_left;
+
+struct make_regular_ordering_right;
+
+template <std::size_t... OrderIndices>
+struct make_regular_ordering_explicit;
+
+///////////////////////////////////////////////////////////////////////////////
+
 template <
-    template <typename, typename, typename, typename> class LayoutMapping
-  , std::size_t... OrderIndices
+    template <typename, typename, typename, typename> class LayoutMappingRegular
+  , typename MakeRegularOrdering
 >
 struct layout_regular_impl;
 
@@ -527,17 +538,20 @@ using layout_mapping_regular = layout_mapping_regular_precomputed_strides<
 
 template <std::size_t... OrderIndices>
 using layout_regular_precomputed_strides = detail::layout_regular_impl<
-    layout_mapping_regular_precomputed_strides, OrderIndices...
+    layout_mapping_regular_precomputed_strides
+  , detail::make_regular_ordering_explicit<OrderIndices...>
 >;
 
 template <std::size_t... OrderIndices>
 using layout_regular_on_demand_strides = detail::layout_regular_impl<
-    layout_mapping_regular_on_demand_strides, OrderIndices...
+    layout_mapping_regular_on_demand_strides
+  , detail::make_regular_ordering_explicit<OrderIndices...>
 >;
 
 template <std::size_t... OrderIndices>
 using layout_regular = detail::layout_regular_impl<
-    layout_mapping_regular, OrderIndices...
+    layout_mapping_regular
+  , detail::make_regular_ordering_explicit<OrderIndices...>
 >;
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -14,11 +14,30 @@
 namespace std { namespace experimental { namespace detail
 {
 
+struct make_regular_ordering_left
+{
+    template <typename Dimensions>
+    using ordering = make_index_sequence<Dimensions::rank()>;
+};
+
+struct make_regular_ordering_right
+{
+    template <typename Dimensions>
+    using ordering = make_reversed_index_sequence<Dimensions::rank()>;
+};
+
+template <std::size_t... OrderIndices>
+struct make_regular_ordering_explicit
+{
+    template <typename Dimensions>
+    using ordering = index_sequence<OrderIndices...>;
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 
 template <
-    template <typename, typename, typename, typename> typename LayoutMapping
-  , std::size_t... OrderIndices
+    template <typename, typename, typename, typename> class LayoutMappingRegular
+  , typename MakeRegularOrdering
 >
 struct layout_regular_impl
 {
@@ -30,21 +49,21 @@ struct layout_regular_impl
         {
             // Striding specified, padding specified.
             template <typename Dimensions>
-            using mapping = LayoutMapping<
+            using mapping = LayoutMappingRegular<
                 Dimensions
               , dimensions<Steps...>
               , dimensions<Pads...>
-              , index_sequence<OrderIndices...> 
+              , typename MakeRegularOrdering::template ordering<Dimensions>
             >;
         };
 
         // Striding specified, padding defaulted.
         template <typename Dimensions>
-        using mapping = LayoutMapping<
+        using mapping = LayoutMappingRegular<
             Dimensions
           , dimensions<Steps...>
           , detail::make_filled_dims_t<Dimensions::rank(), 0>
-          , index_sequence<OrderIndices...> 
+          , typename MakeRegularOrdering::template ordering<Dimensions>
         >;
     };
 
@@ -56,31 +75,31 @@ struct layout_regular_impl
         {
             // Striding specified, padding specified.
             template <typename Dimensions>
-            using mapping = LayoutMapping<
+            using mapping = LayoutMappingRegular<
                 Dimensions
               , dimensions<Steps...>
               , dimensions<Pads...> 
-              , index_sequence<OrderIndices...> 
+              , typename MakeRegularOrdering::template ordering<Dimensions>
             >;
         };
 
         // Striding defaulted, padding specified.
         template <typename Dimensions>
-        using mapping = LayoutMapping<
+        using mapping = LayoutMappingRegular<
             Dimensions
           , detail::make_filled_dims_t<Dimensions::rank(), 1>
           , dimensions<Pads...>
-          , index_sequence<OrderIndices...> 
+          , typename MakeRegularOrdering::template ordering<Dimensions>
         >;
     };
 
     // Striding defaulted, padding defaulted.
     template <typename Dimensions>
-    using mapping = LayoutMapping<
+    using mapping = LayoutMappingRegular<
         Dimensions
       , detail::make_filled_dims_t<Dimensions::rank(), 1>
       , detail::make_filled_dims_t<Dimensions::rank(), 0>
-      , index_sequence<OrderIndices...> 
+      , typename MakeRegularOrdering::template ordering<Dimensions>
     >;
 };
 
