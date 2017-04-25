@@ -124,49 +124,6 @@ constexpr
 dimensions<Dims...>::dimensions() noexcept
   : dynamic_dims_{} {}
 
-/*
-template <std::size_t... Dims>
-template <
-    typename... DynamicDims
-  , typename enable_if<
-        dimensions<Dims...>::rank_dynamic() == sizeof...(DynamicDims)
-    >::type* 
->
-constexpr
-dimensions<Dims...>::dimensions(DynamicDims... ddims) noexcept
-  // FIXME: We cast here to avoid a narrowing conversion warning from GCC.
-  // I'm not thrilled about it.
-  : dynamic_dims_{{static_cast<value_type>(ddims)...}}
-{
-    static_assert(
-        detail::is_integral_pack<DynamicDims...>::value
-      , "Non-integral types passed to dimensions<> constructor."
-    );
-}
-
-template <std::size_t... Dims>
-template <
-    typename... StaticAndDynamicDims
-  , typename enable_if<
-        (dimensions<Dims...>::rank() != dimensions<Dims...>::rank_dynamic())
-     && (dimensions<Dims...>::rank() == sizeof...(StaticAndDynamicDims))
-    >::type*
->
-constexpr
-dimensions<Dims...>::dimensions(StaticAndDynamicDims... sddims) noexcept
-  : dynamic_dims_{
-        detail::filter_initialize_dynamic_dims_array<Dims...>(
-            0, dynamic_dims_array{{}}, sddims...
-        )
-    }
-{
-    static_assert(
-        detail::is_integral_pack<StaticAndDynamicDims...>::value
-      , "Non-integral types passed to dimensions<> constructor."
-    );
-}
-*/
-
 template <std::size_t... Dims>
 template <std::size_t N>
 constexpr
