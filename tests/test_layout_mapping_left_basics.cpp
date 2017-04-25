@@ -29,6 +29,7 @@ void test_1d_static()
     BOOST_TEST_EQ((l.is_regular()), true);
 
     BOOST_TEST_EQ((l.is_dynamic_stride(0)), false);
+
     BOOST_TEST_EQ((l.stride(0)), 1);
 
     BOOST_TEST_EQ((l.size()), X);
@@ -59,6 +60,7 @@ void test_1d_dynamic()
     BOOST_TEST_EQ((l.is_regular()), true);
 
     BOOST_TEST_EQ((l.is_dynamic_stride(0)), true);
+
     BOOST_TEST_EQ((l.stride(0)), 1);
 
     BOOST_TEST_EQ((l.size()), X);
@@ -91,6 +93,9 @@ void test_2d_static()
     > const l{};
 
     BOOST_TEST_EQ((l.is_regular()), true);
+
+    BOOST_TEST_EQ((l.is_dynamic_stride(0)), false);
+    BOOST_TEST_EQ((l.is_dynamic_stride(1)), false);
 
     BOOST_TEST_EQ((l.stride(0)), 1);
     BOOST_TEST_EQ((l.stride(1)), X);
@@ -126,6 +131,9 @@ void test_2d_dynamic()
     > const l{{X, Y}};
 
     BOOST_TEST_EQ((l.is_regular()), true);
+
+    BOOST_TEST_EQ((l.is_dynamic_stride(0)), true);
+    BOOST_TEST_EQ((l.is_dynamic_stride(1)), true);
 
     BOOST_TEST_EQ((l.stride(0)), 1);
     BOOST_TEST_EQ((l.stride(1)), X);
@@ -167,6 +175,9 @@ void test_2d_mixed()
 
     BOOST_TEST_EQ((l.is_regular()), true);
 
+    BOOST_TEST_EQ((l.is_dynamic_stride(0)), true);
+    BOOST_TEST_EQ((l.is_dynamic_stride(1)), false);
+
     BOOST_TEST_EQ((l.stride(0)), 1);
     BOOST_TEST_EQ((l.stride(1)), X);
 
@@ -207,9 +218,13 @@ void test_3d_static()
 
     BOOST_TEST_EQ((l.is_regular()), true);
 
+    BOOST_TEST_EQ((l.is_dynamic_stride(0)), false);
+    BOOST_TEST_EQ((l.is_dynamic_stride(1)), false);
+    BOOST_TEST_EQ((l.is_dynamic_stride(2)), false);
+
     BOOST_TEST_EQ((l.stride(0)), 1);
-    BOOST_TEST_EQ((l.stride(1)), 1);
-    BOOST_TEST_EQ((l.stride(2)), 1);
+    BOOST_TEST_EQ((l.stride(1)), X);
+    BOOST_TEST_EQ((l.stride(2)), X * Y);
 
     BOOST_TEST_EQ((l.size()), X * Y * Z);
     BOOST_TEST_EQ((l.span()), X * Y * Z);
@@ -246,9 +261,13 @@ void test_3d_dynamic()
 
     BOOST_TEST_EQ((l.is_regular()), true);
 
+    BOOST_TEST_EQ((l.is_dynamic_stride(0)), true);
+    BOOST_TEST_EQ((l.is_dynamic_stride(1)), true);
+    BOOST_TEST_EQ((l.is_dynamic_stride(2)), true);
+
     BOOST_TEST_EQ((l.stride(0)), 1);
-    BOOST_TEST_EQ((l.stride(1)), 1);
-    BOOST_TEST_EQ((l.stride(2)), 1);
+    BOOST_TEST_EQ((l.stride(1)), X);
+    BOOST_TEST_EQ((l.stride(2)), X * Y);
 
     BOOST_TEST_EQ((l.size()), l[0] * l[1] * l[2]);
     BOOST_TEST_EQ((l.span()), l[0] * l[1] * l[2]);
