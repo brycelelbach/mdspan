@@ -30,6 +30,7 @@ struct dimensions
     // RANK, SIZE AND EXTENT 
 
     static constexpr size_type rank() noexcept;
+    // TODO: rank_static()
     static constexpr size_type rank_dynamic() noexcept;
 
     static constexpr bool is_dynamic(size_type rank) noexcept;
@@ -54,45 +55,99 @@ struct dimensions
     // Construct from a parameter pack of dynamic dimensions.
     template <
         typename... DynamicDims
+        // {{{ SFINAE condition
       , detail::enable_if_t<
-            dimensions<Dims...>::rank_dynamic() == sizeof...(DynamicDims)
-        >* = nullptr 
+            (detail::is_integral_pack<DynamicDims...>::value)
+         && (dimensions<Dims...>::rank_dynamic() == sizeof...(DynamicDims))
+        >* = nullptr
+        // }}}
     >
     constexpr dimensions(DynamicDims... ddims) noexcept
-      : dynamic_dims_{{static_cast<value_type>(ddims)...}}
-    {
-        static_assert(
-            detail::is_integral_pack<DynamicDims...>::value
-          , "Non-integral types passed to dimensions<> constructor."
-        );
-    }
+    // {{{
+      : dynamic_dims_{{static_cast<value_type>(ddims)...}} {}
+    // }}}
+
+    // TODO: Maybe axe this ctor
 
     // Construct from a parameter pack of static and dynamic dimensions.
     template <
         typename... StaticAndDynamicDims
+        // {{{ SFINAE condition
       , detail::enable_if_t<
-            (dimensions<Dims...>::rank() != dimensions<Dims...>::rank_dynamic())
-            // The above ctor handles the rank() == rank_dynamic() case.
+            (detail::is_integral_pack<StaticAndDynamicDims...>::value)
          && (dimensions<Dims...>::rank() == sizeof...(StaticAndDynamicDims))
+         && (dimensions<Dims...>::rank() != dimensions<Dims...>::rank_dynamic())
+            // The above ctor handles the rank() == rank_dynamic() case.
         >* = nullptr
+        // }}}
     >
     constexpr dimensions(StaticAndDynamicDims... sddims) noexcept
+    // {{{
       : dynamic_dims_{
             detail::filter_initialize_dynamic_dims_array<Dims...>(
                 0, dynamic_dims_array{{}}, sddims...
             )
         }
-    {
-        static_assert(
-            detail::is_integral_pack<StaticAndDynamicDims...>::value
-          , "Non-integral types passed to dimensions<> constructor."
-        );
-    }
+    {} // }}}
 
     template <std::size_t N>
     constexpr dimensions(array<value_type, N> a) noexcept;
 
+    template <
+        typename Generator
+        // {{{ SFINAE condition
+      , detail::enable_if_t<
+            is_same<
+                value_type
+              , decltype(
+                    declval<Generator>()(
+                        declval<integral_constant<size_type, 0>>()
+                      , declval<integral_constant<value_type, 0>>()
+                    )
+                )
+            >::value
+        >* = nullptr
+        // }}}
+    >
+    constexpr dimensions(Generator&& g) noexcept
+    // {{{
+      : dimensions(
+            std::forward<Generator>(g)
+          , detail::make_index_sequence<sizeof...(Dims)>{}
+        )
+    {} // }}}
+
   private:
+
+    template <
+        typename Generator
+      , std::size_t... RankIndices 
+        // {{{ SFINAE condition
+      , detail::enable_if_t<
+            is_same<
+                value_type
+              , decltype(
+                    declval<Generator>()(
+                        declval<integral_constant<size_type, 0>>()
+                      , declval<integral_constant<value_type, 0>>()
+                    )
+                )
+            >::value
+        >* = nullptr
+        // }}}
+    >
+    constexpr dimensions(
+        Generator&& g
+      , detail::index_sequence<RankIndices...>
+        ) noexcept
+    // {{{
+      : dynamic_dims_{{
+            g(
+                integral_constant<size_type, RankIndices>{}
+              , integral_constant<value_type, Dims>{}
+            )...
+        }}
+    {} // }}}
 
     ///////////////////////////////////////////////////////////////////////////
 
