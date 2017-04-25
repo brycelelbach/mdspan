@@ -39,6 +39,10 @@ struct negation;
 template <bool B, typename True, typename False>
 using conditional_t = typename conditional<B, True, False>::type;
 
+// SFINAE helper.
+template <bool B, typename T = void>
+using enable_if_t = typename enable_if<B, T>::type;
+
 ///////////////////////////////////////////////////////////////////////////////
 
 // C++14's integer_sequence and associated helper aliases plus some non-standard
