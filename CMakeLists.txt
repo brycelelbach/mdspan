@@ -51,6 +51,8 @@ if(MDSPAN_WARNINGS)
   endif()
 endif()
 
+add_definitions(-DBOOST_LIGHTWEIGHT_TEST_OSTREAM=std::cout)
+
 include_directories(${mdspan_SOURCE_DIR}/include)
 
 file(GLOB_RECURSE HEADERS include/mdspan include/*.hpp)
