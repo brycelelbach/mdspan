@@ -140,6 +140,21 @@ struct layout_mapping_regular_base<
     ///////////////////////////////////////////////////////////////////////////
     // INDEXING
 
+    constexpr size_type stride_static(size_type rank) const noexcept
+    { // {{{
+        return computed_static_stride_[rto(rank)];
+    } // }}}
+
+/* FIXME
+    constexpr dimensions<computed_static_stride_[otr(OrderIndices)]...>
+    strides_static() const noexcept
+    { // {{{
+        return dimensions<
+            computed_static_stride_[otr(OrderIndices)]...
+        >(otr(OrderIndices)...); 
+    } // }}}
+*/
+
     // Must be implemented by the derived class.
     //constexpr size_type stride(size_type rank) const noexcept;
 
