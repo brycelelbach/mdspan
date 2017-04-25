@@ -256,8 +256,6 @@ struct make_integer_sequence_inverse_mapping_impl<integer_sequence<T, I...> >
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#warning All of these could be constexpr functions instead.
-
 template <std::size_t N, typename Dimensions>
 struct is_rank_greater_than
   : integral_constant<bool, N < Dimensions::rank()> {};

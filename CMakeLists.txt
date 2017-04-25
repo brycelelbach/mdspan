@@ -73,8 +73,7 @@ set(TESTS
     test_layout_mapping_right_padding
     test_layout_mapping_right_stepping
     test_layout_mapping_right_stepping_padding
-    test_layout_mapping_regular_precomputed_strides_basics
-    test_layout_mapping_regular_precomputed_strides_left_basics
+    test_layout_mapping_regular_base
     test_meta_count_dynamic_dims
     test_meta_count_integral_range_slice_specifiers
     test_meta_extract_dimensions

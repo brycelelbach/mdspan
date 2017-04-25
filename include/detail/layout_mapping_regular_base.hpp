@@ -76,7 +76,6 @@ struct layout_mapping_regular_base<
     using base_type = Dimensions;
 
     using typename Dimensions::value_type;
-    //using size_type = typename Dimensions::size_type; 
     using typename Dimensions::size_type;
 
     // Smallest stride dimension to largest stride dimension (order to rank).
@@ -103,8 +102,8 @@ struct layout_mapping_regular_base<
         layout_mapping_regular_base&&
         ) noexcept = default;
 
-    template <typename... DynamicDims>
-    constexpr layout_mapping_regular_base(DynamicDims&&... ddims) noexcept;
+    template <typename... ForwardDims>
+    constexpr layout_mapping_regular_base(ForwardDims&&... fdims) noexcept;
 
     template <std::size_t N>
     constexpr layout_mapping_regular_base(array<value_type, N> a) noexcept;
@@ -217,14 +216,14 @@ template <
   , typename Pads
   , typename Dimensions::size_type... OrderIndices
     >
-template <typename... DynamicDims>
+template <typename... ForwardDims>
 constexpr layout_mapping_regular_base<
     Dimensions
   , Steps
   , Pads
   , index_sequence<OrderIndices...>
->::layout_mapping_regular_base(DynamicDims&&... ddims) noexcept
-  : base_type(std::forward<DynamicDims>(ddims)...)
+>::layout_mapping_regular_base(ForwardDims&&... fdims) noexcept
+  : base_type(std::forward<ForwardDims>(fdims)...)
   , steps_()
   , pads_()
 {}

@@ -98,3 +98,7 @@ Enum class index protection: Can we use enum classes to avoid using an index wit
 
 Construction from containers: auto ar = make_array_ref(vector)
 
+dimensions and derivers of dimensions need comparison operators.
+ 
+is_rank_* - All of these could be constexpr functions instead.
+

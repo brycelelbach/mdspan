@@ -79,9 +79,9 @@ struct layout_mapping_regular_precomputed_strides<
         layout_mapping_regular_precomputed_strides&&
         ) noexcept = default;
 
-    template <typename... DynamicDims>
+    template <typename... ForwardDims>
     constexpr layout_mapping_regular_precomputed_strides(
-        DynamicDims&&... ddims
+        ForwardDims&&... fdims
         ) noexcept;
 
     template <typename Dimensions::size_type N>
@@ -163,20 +163,16 @@ template <
   , typename Pads
   , typename Dimensions::size_type... OrderIndices
     >
-template <typename... DynamicDims>
+template <typename... ForwardDims>
 constexpr layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
   , index_sequence<OrderIndices...>
->::layout_mapping_regular_precomputed_strides(DynamicDims&&... ddims) noexcept
-  : base_type(std::forward<DynamicDims>(ddims)...)
+>::layout_mapping_regular_precomputed_strides(ForwardDims&&... fdims) noexcept
+  : base_type(std::forward<ForwardDims>(fdims)...)
   , stride_(
-        filter_initialize_dynamic_dims_array(
-            0
-          , array<value_type, base_type::rank_dynamic()>{{}}
-          , compute_dynamic_stride<otr(OrderIndices)>(*this, Steps(), Pads())...
-        )
+        compute_dynamic_stride<otr(OrderIndices)>(*this, Steps(), Pads())...
     )
 {}
 
@@ -195,11 +191,7 @@ constexpr layout_mapping_regular_precomputed_strides<
 >::layout_mapping_regular_precomputed_strides(array<value_type, N> a) noexcept
   : base_type(a)
   , stride_(
-        filter_initialize_dynamic_dims_array(
-            0
-          , array<value_type, base_type::rank_dynamic()>{{}}
-          , compute_dynamic_stride<otr(OrderIndices)>(*this, Steps(), Pads())...
-        )
+        compute_dynamic_stride<otr(OrderIndices)>(*this, Steps(), Pads())...
     )
 {}
 
@@ -219,11 +211,7 @@ constexpr layout_mapping_regular_precomputed_strides<
     ) noexcept
   : base_type(d, s, p)
   , stride_(
-        filter_initialize_dynamic_dims_array(
-            0
-          , array<value_type, base_type::rank_dynamic()>{{}}
-          , compute_dynamic_stride<otr(OrderIndices)>(d, s, p)...
-        )
+        compute_dynamic_stride<otr(OrderIndices)>(d, s, p)...
     )
 {}
 
@@ -241,11 +229,7 @@ constexpr layout_mapping_regular_precomputed_strides<
 >::layout_mapping_regular_precomputed_strides(Dimensions d) noexcept
   : base_type(d)
   , stride_(
-        filter_initialize_dynamic_dims_array(
-            0
-          , array<value_type, base_type::rank_dynamic()>{{}}
-          , compute_dynamic_stride<otr(OrderIndices)>(d, Steps(), Pads())...
-        )
+        compute_dynamic_stride<otr(OrderIndices)>(d, Steps(), Pads())...
     )
 {}
 
