@@ -40,7 +40,7 @@ void test_2d_static()
     for (auto j = 0; j < l[1]; ++j)
     for (auto i = 0; i < l[0]; ++i)
     {
-        auto const true_idx = (i) + (l[0] + l.padding()[0]) * (j);
+        auto const true_idx = (i) + (l[0] + l.pads()[0]) * (j);
 
         BOOST_TEST_EQ((l.index(i, j)), true_idx);
 
@@ -52,17 +52,17 @@ void test_2d_static()
     }
 
     // Set X pad elements to 17 and Y pad elements to 24. 
-    for (auto j = 0; j < l[1] + l.padding()[1]; ++j)
-    for (auto i = 0; i < l[0] + l.padding()[0]; ++i)
+    for (auto j = 0; j < l[1] + l.pads()[1]; ++j)
+    for (auto i = 0; i < l[0] + l.pads()[0]; ++i)
     {
-        auto const true_idx = (i) + (l[0] + l.padding()[0]) * (j);
+        auto const true_idx = (i) + (l[0] + l.pads()[0]) * (j);
 
         BOOST_TEST_EQ((l.index(i, j)), true_idx);
 
         BOOST_TEST_EQ(&(dptr[l.index(i, j)]), &(dptr[true_idx])); 
 
         // X-pad element.
-        if      ((l[0] <= i) && (i < (l[0] + l.padding()[0])))
+        if      ((l[0] <= i) && (i < (l[0] + l.pads()[0])))
         {
             dptr[l.index(i, j)] = 17;
             
@@ -70,7 +70,7 @@ void test_2d_static()
         }
 
         // Y-pad element.
-        else if ((l[1] <= j) && (j < (l[1] + l.padding()[1])))
+        else if ((l[1] <= j) && (j < (l[1] + l.pads()[1])))
         {
             dptr[l.index(i, j)] = 24;
 
@@ -79,23 +79,23 @@ void test_2d_static()
     }
 
     // Check final structure. 
-    for (auto j = 0; j < l[1] + l.padding()[1]; ++j)
-    for (auto i = 0; i < l[0] + l.padding()[0]; ++i)
+    for (auto j = 0; j < l[1] + l.pads()[1]; ++j)
+    for (auto i = 0; i < l[0] + l.pads()[0]; ++i)
     {
-        auto const true_idx = (i) + (l[0] + l.padding()[0]) * (j);
+        auto const true_idx = (i) + (l[0] + l.pads()[0]) * (j);
 
         BOOST_TEST_EQ((l.index(i, j)), true_idx);
 
         BOOST_TEST_EQ(&(dptr[l.index(i, j)]), &(dptr[true_idx])); 
 
         // X-pad element.
-        if      ((l[0] <= i) && (i < (l[0] + l.padding()[0])))
+        if      ((l[0] <= i) && (i < (l[0] + l.pads()[0])))
         {
             BOOST_TEST_EQ((dptr[l.index(i, j)]), 17);
         }
 
         // Y-pad element.
-        else if ((l[1] <= j) && (j < (l[1] + l.padding()[1])))
+        else if ((l[1] <= j) && (j < (l[1] + l.pads()[1])))
         {
             BOOST_TEST_EQ((dptr[l.index(i, j)]), 24);
         }
@@ -125,20 +125,20 @@ void test_2d_dynamic()
 
     // Initialize all elements to 42.
     std::vector<int> data(
-        (l[0] + l.padding()[0]) * (l[1] + l.padding()[1]), 42
+        (l[0] + l.pads()[0]) * (l[1] + l.pads()[1]), 42
     );
     int* dptr = data.data();
 
     // Set X pad elements to 17 and Y pad elements to 24. 
-    for (auto j = 0; j < l[1] + l.padding()[1]; ++j)
-    for (auto i = 0; i < l[0] + l.padding()[0]; ++i)
+    for (auto j = 0; j < l[1] + l.pads()[1]; ++j)
+    for (auto i = 0; i < l[0] + l.pads()[0]; ++i)
     {
-        auto const true_idx = (i) + (l[0] + l.padding()[0]) * (j);
+        auto const true_idx = (i) + (l[0] + l.pads()[0]) * (j);
 
         BOOST_TEST_EQ((l.index(i, j)), true_idx);
 
         // X-pad element.
-        if      ((l[0] <= i) && (i < (l[0] + l.padding()[0])))
+        if      ((l[0] <= i) && (i < (l[0] + l.pads()[0])))
         {
             dptr[l.index(i, j)] = 17;
             
@@ -149,7 +149,7 @@ void test_2d_dynamic()
         }
 
         // Y-pad element.
-        else if ((l[1] <= j) && (j < (l[1] + l.padding()[1])))
+        else if ((l[1] <= j) && (j < (l[1] + l.pads()[1])))
         {
             dptr[l.index(i, j)] = 24;
 
@@ -161,15 +161,15 @@ void test_2d_dynamic()
     }
 
     // Check final structure. 
-    for (auto j = 0; j < l[1] + l.padding()[1]; ++j)
-    for (auto i = 0; i < l[0] + l.padding()[0]; ++i)
+    for (auto j = 0; j < l[1] + l.pads()[1]; ++j)
+    for (auto i = 0; i < l[0] + l.pads()[0]; ++i)
     {
         auto const true_idx = i + j * (l[0] + N);
 
         BOOST_TEST_EQ((l.index(i, j)), true_idx);
 
         // X-pad element.
-        if      ((l[0] <= i) && (i < (l[0] + l.padding()[0])))
+        if      ((l[0] <= i) && (i < (l[0] + l.pads()[0])))
         {
             BOOST_TEST_EQ((dptr[l.index(i, j)]), 17);
 
@@ -178,7 +178,7 @@ void test_2d_dynamic()
         }
 
         // Y-pad element.
-        else if ((l[1] <= j) && (j < (l[1] + l.padding()[1])))
+        else if ((l[1] <= j) && (j < (l[1] + l.pads()[1])))
         {
             BOOST_TEST_EQ((dptr[l.index(i, j)]), 24);
 

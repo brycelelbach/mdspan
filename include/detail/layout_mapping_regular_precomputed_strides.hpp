@@ -29,12 +29,12 @@ struct layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 > : detail::layout_mapping_regular_base<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 >
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ struct layout_mapping_regular_precomputed_strides<
         Dimensions
       , Steps
       , Pads
-      , index_sequence<OrderIndices...>
+      , detail::index_sequence<OrderIndices...>
     >;
 
     using typename base_type::value_type;
@@ -93,6 +93,11 @@ struct layout_mapping_regular_precomputed_strides<
     ///////////////////////////////////////////////////////////////////////////
     // DOMAIN SPACE
 
+    using base_type::otr;
+    using base_type::rto;
+    using base_type::is_regular;
+    using base_type::is_dynamic_stride;
+
     constexpr size_type stride(size_type rank) const noexcept;
 
     constexpr dimensions<base_type::computed_static_stride_[otr(OrderIndices)]...>
@@ -120,11 +125,41 @@ struct layout_mapping_regular_precomputed_strides<
 
     // Pass Rank as a template parameter instead of a function parameter to 
     // avoid recursion on the same function signature.
+
+    // Base case.
     template <
-        typename Dimensions::size_type Rank
+        typename Dimensions::size_type    Rank
       , typename Dimensions::size_type... IdxDims
         >
-    constexpr size_type compute_index(dimensions<IdxDims...> i) const noexcept;
+    constexpr typename enable_if<
+         detail::is_rank_unit_stride<Rank, Dimensions, ordering>::value
+      , size_type
+    >::type
+    compute_index(dimensions<IdxDims...> i) const noexcept
+    { // {{{
+        static_assert(
+            Dimensions::rank() == sizeof...(IdxDims)
+          , "The ranks of Dimensions and dimensions<IdxDims...> are not equal."
+        );
+        return i[Rank] * stride(Rank);
+    } // }}}
+
+    template <
+        typename Dimensions::size_type    Rank
+      , typename Dimensions::size_type... IdxDims
+        >
+    constexpr typename enable_if<
+        !detail::is_rank_unit_stride<Rank, Dimensions, ordering>::value
+      , size_type
+    >::type
+    compute_index(dimensions<IdxDims...> i) const noexcept
+    { // {{{
+        static_assert(
+            Dimensions::rank() == sizeof...(IdxDims)
+          , "The ranks of Dimensions and dimensions<IdxDims...> are not equal."
+        );
+        return i[Rank] * stride(Rank) + compute_index<otr(rto(Rank) - 1)>(i);
+    } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
 
@@ -144,7 +179,7 @@ constexpr layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 >::layout_mapping_regular_precomputed_strides() noexcept
   : base_type()
   , stride_()
@@ -161,7 +196,7 @@ constexpr layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 >::layout_mapping_regular_precomputed_strides(ForwardDims&&... fdims) noexcept
   : base_type(std::forward<ForwardDims>(fdims)...)
   , stride_(
@@ -180,7 +215,7 @@ constexpr layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 >::layout_mapping_regular_precomputed_strides(array<value_type, N> a) noexcept
   : base_type(a)
   , stride_(
@@ -198,7 +233,7 @@ constexpr layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 >::layout_mapping_regular_precomputed_strides(
     Dimensions d, Steps s, Pads p
     ) noexcept
@@ -218,7 +253,7 @@ constexpr layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 >::layout_mapping_regular_precomputed_strides(Dimensions d) noexcept
   : base_type(d)
   , stride_(
@@ -238,12 +273,12 @@ inline constexpr typename layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 >::size_type layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 >::stride(size_type rank) const noexcept
 {
     return stride_[rto(rank)];
@@ -256,17 +291,17 @@ template <
   , typename Dimensions::size_type... OrderIndices
     >
 inline constexpr dimensions<
-    layout_mapping_regular_base<
+    detail::layout_mapping_regular_base<
         Dimensions
       , Steps
       , Pads
-      , index_sequence<OrderIndices...>
+      , detail::index_sequence<OrderIndices...>
     >::computed_static_stride_[otr(OrderIndices)]...
 > layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 >::strides() const noexcept
 {
     return dimensions<
@@ -274,7 +309,7 @@ inline constexpr dimensions<
             Dimensions
           , Steps
           , Pads
-          , index_sequence<OrderIndices...>
+          , detail::index_sequence<OrderIndices...>
         >::computed_static_stride_[otr(OrderIndices)]...
     >(otr(OrderIndices)...); 
 }
@@ -292,12 +327,12 @@ inline constexpr typename layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 >::size_type layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 >::index(Indices... indices) const noexcept
 {
     static_assert(
@@ -320,20 +355,20 @@ inline constexpr typename layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 >::size_type 
 layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 >::index(dimensions<IdxDims...> i) const noexcept
 {
     static_assert(
         Dimensions::rank() == sizeof...(IdxDims)
       , "The ranks of Dimensions and dimensions<IdxDims...> are not equal."
     );
-    return compute_index<Dimensions::rank()>(i);
+    return compute_index<Dimensions::rank() - 1>(i);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -353,12 +388,12 @@ inline constexpr typename layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 >::size_type layout_mapping_regular_precomputed_strides<
     Dimensions
   , Steps
   , Pads
-  , index_sequence<OrderIndices...>
+  , detail::index_sequence<OrderIndices...>
 >::compute_dynamic_stride(
     Dimensions      d
   , Steps        s
@@ -367,46 +402,9 @@ inline constexpr typename layout_mapping_regular_precomputed_strides<
 {
     return ( is_dynamic_stride(Rank)
            ? base_type::computed_static_stride_[rto(Rank)]
-           : base_type::compute_stride<Rank>(
+           : base_type::template compute_stride<Rank>(
                 d, s, p, stride_
              )
-           );
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-template <
-    typename Dimensions
-  , typename Steps
-  , typename Pads
-  , typename Dimensions::size_type... OrderIndices
-    >
-// Pass Rank as a template parameter instead of a function parameter to 
-// avoid recursion on the same function signature.
-template <
-    typename Dimensions::size_type    Rank
-  , typename Dimensions::size_type... IdxDims 
-    >
-inline constexpr typename layout_mapping_regular_precomputed_strides<
-    Dimensions
-  , Steps
-  , Pads
-  , index_sequence<OrderIndices...>
->::size_type layout_mapping_regular_precomputed_strides<
-    Dimensions
-  , Steps
-  , Pads
-  , index_sequence<OrderIndices...>
->::compute_index(dimensions<IdxDims...> i) const noexcept
-{
-    static_assert(
-        Dimensions::rank() == sizeof...(IdxDims)
-      , "The ranks of Dimensions and dimensions<IdxDims...> are not equal."
-    );
-    return i[Rank] * stride(Rank)
-         + ( is_rank_unit_stride<Rank, Dimensions, ordering>::value
-           ? size_type(0)
-           : compute_index<otr(rto(Rank) - 1)>(i) 
            );
 }
 

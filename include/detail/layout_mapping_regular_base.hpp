@@ -40,14 +40,6 @@ template <
     typename Dimensions
   , typename Steps
   , typename Pads
-  , typename Ordering
-    >
-struct layout_mapping_regular_base;
-
-template <
-    typename Dimensions
-  , typename Steps
-  , typename Pads
   , typename Dimensions::size_type... OrderIndices
     >
 struct layout_mapping_regular_base<
@@ -118,15 +110,24 @@ struct layout_mapping_regular_base<
 
     // Order-to-rank mapping. Returns the rank of the dimension with the
     // specified ordering.
-    static constexpr size_type otr(size_type order) noexcept;
+    static constexpr size_type otr(size_type order) noexcept
+    { // {{{
+        return integer_sequence_array<ordering>()[order];
+    } // }}}
 
     // Rank-to-order mapping. Returns the ordering for the dimension with the
     // specified rank.
-    static constexpr size_type rto(size_type rank) noexcept;
+    static constexpr size_type rto(size_type rank) noexcept
+    { // {{{
+        return integer_sequence_array<inverse_ordering>()[rank];
+    } // }}}
 
     static constexpr bool is_regular() noexcept;
 
-    static constexpr bool is_dynamic_stride(size_type rank) noexcept;
+    static constexpr bool is_dynamic_stride(size_type rank) noexcept
+    { // {{{
+        return computed_is_dynamic_stride_[rto(rank)];
+    } // }}}
 
     constexpr size_type span() const noexcept;
 
@@ -160,7 +161,16 @@ struct layout_mapping_regular_base<
     ///////////////////////////////////////////////////////////////////////////
 
     template <typename Dimensions::size_type Rank>
-    static constexpr bool compute_is_dynamic_stride() noexcept;
+    static constexpr bool compute_is_dynamic_stride() noexcept
+    { // {{{
+        return ( is_rank_unit_stride<Rank, Dimensions, ordering>::value
+               ? true 
+               // We don't use is_dynamic_stride here because GCC chokes on it
+               // when calling this function at constexpr time. 
+               : computed_is_dynamic_stride_[rto(Rank) - 1]
+               )
+            || Pads::is_dynamic(Rank) || Steps::is_dynamic(Rank);
+    } // }}}
 
     // Indexed by order, not rank.
     static constexpr bool computed_is_dynamic_stride_[] =
@@ -289,48 +299,6 @@ template <
   , typename Pads
   , typename Dimensions::size_type... OrderIndices
     >
-inline constexpr typename layout_mapping_regular_base<
-    Dimensions
-  , Steps
-  , Pads
-  , index_sequence<OrderIndices...>
->::size_type layout_mapping_regular_base<
-    Dimensions
-  , Steps
-  , Pads
-  , index_sequence<OrderIndices...>
->::otr(size_type order) noexcept
-{
-    return integer_sequence_array<ordering>()[order];
-}
-
-template <
-    typename Dimensions
-  , typename Steps
-  , typename Pads
-  , typename Dimensions::size_type... OrderIndices
-    >
-inline constexpr typename layout_mapping_regular_base<
-    Dimensions
-  , Steps
-  , Pads
-  , index_sequence<OrderIndices...>
->::size_type layout_mapping_regular_base<
-    Dimensions
-  , Steps
-  , Pads
-  , index_sequence<OrderIndices...>
->::rto(size_type rank) noexcept
-{
-    return integer_sequence_array<inverse_ordering>()[rank];
-}
-
-template <
-    typename Dimensions
-  , typename Steps
-  , typename Pads
-  , typename Dimensions::size_type... OrderIndices
-    >
 inline constexpr bool layout_mapping_regular_base<
     Dimensions
   , Steps
@@ -339,22 +307,6 @@ inline constexpr bool layout_mapping_regular_base<
 >::is_regular() noexcept
 {
     return true; 
-}
-
-template <
-    typename Dimensions
-  , typename Steps
-  , typename Pads
-  , typename Dimensions::size_type... OrderIndices
-    >
-inline constexpr bool layout_mapping_regular_base<
-    Dimensions
-  , Steps
-  , Pads
-  , index_sequence<OrderIndices...>
->::is_dynamic_stride(size_type rank) noexcept
-{
-    return computed_is_dynamic_stride_[rto(rank)];
 }
 
 template <
@@ -459,34 +411,6 @@ inline constexpr Pads layout_mapping_regular_base<
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-template <
-    typename Dimensions
-  , typename Steps
-  , typename Pads
-  , typename Dimensions::size_type... OrderIndices
-    >
-// Pass Rank as a template parameter instead of a function parameter to 
-// avoid recursion on the same function signature.
-template <
-    typename Dimensions::size_type Rank
-    >
-inline constexpr bool layout_mapping_regular_base<
-    Dimensions
-  , Steps
-  , Pads
-  , index_sequence<OrderIndices...>
->::compute_is_dynamic_stride() noexcept
-{
-    // is_dynamic_stride(otr(rto(Rank) - 1)) just looks up the previous
-    // entry in the array, so we check it first so that we'll short circuit
-    // if it's false.
-    return ( is_rank_unit_stride<Rank, Dimensions, ordering>::value
-           ? true 
-           : is_dynamic_stride(otr(rto(Rank) - 1))
-           )
-        || Pads::is_dynamic(Rank) || Steps::is_dynamic(Rank);
-}
 
 template <
     typename Dimensions

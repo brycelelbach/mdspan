@@ -5,33 +5,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#if !defined(STD_1147DB06_B234_4218_9C7F_0E1EAEF9B78E)
-#define STD_1147DB06_B234_4218_9C7F_0E1EAEF9B78E
+#if !defined(STD_AF26FDB8_0F80_44F9_BBDB_3BC8BEB16454)
+#define STD_AF26FDB8_0F80_44F9_BBDB_3BC8BEB16454
 
 #include "detail/fwd.hpp"
 #include "detail/integer_sequence.hpp"
 
 namespace std { namespace experimental { namespace detail
 {
-
-struct make_regular_ordering_left
-{
-    template <typename Dimensions>
-    using ordering = make_index_sequence<Dimensions::rank()>;
-};
-
-struct make_regular_ordering_right
-{
-    template <typename Dimensions>
-    using ordering = make_reversed_index_sequence<Dimensions::rank()>;
-};
-
-template <std::size_t... OrderIndices>
-struct make_regular_ordering_explicit
-{
-    template <typename Dimensions>
-    using ordering = index_sequence<OrderIndices...>;
-};
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -53,7 +34,7 @@ struct layout_regular_impl
                 Dimensions
               , dimensions<Steps...>
               , dimensions<Pads...>
-              , typename MakeRegularOrdering::template ordering<Dimensions>
+              , typename MakeRegularOrdering::template apply<Dimensions>
             >;
         };
 
@@ -63,7 +44,7 @@ struct layout_regular_impl
             Dimensions
           , dimensions<Steps...>
           , detail::make_filled_dims_t<Dimensions::rank(), 0>
-          , typename MakeRegularOrdering::template ordering<Dimensions>
+          , typename MakeRegularOrdering::template apply<Dimensions>
         >;
     };
 
@@ -79,7 +60,7 @@ struct layout_regular_impl
                 Dimensions
               , dimensions<Steps...>
               , dimensions<Pads...> 
-              , typename MakeRegularOrdering::template ordering<Dimensions>
+              , typename MakeRegularOrdering::template apply<Dimensions>
             >;
         };
 
@@ -89,7 +70,7 @@ struct layout_regular_impl
             Dimensions
           , detail::make_filled_dims_t<Dimensions::rank(), 1>
           , dimensions<Pads...>
-          , typename MakeRegularOrdering::template ordering<Dimensions>
+          , typename MakeRegularOrdering::template apply<Dimensions>
         >;
     };
 
@@ -99,11 +80,11 @@ struct layout_regular_impl
         Dimensions
       , detail::make_filled_dims_t<Dimensions::rank(), 1>
       , detail::make_filled_dims_t<Dimensions::rank(), 0>
-      , typename MakeRegularOrdering::template ordering<Dimensions>
+      , typename MakeRegularOrdering::template apply<Dimensions>
     >;
 };
 
-}} // std::experimental
+}}} // std::experimental::detail
 
-#endif // STD_1147DB06_B234_4218_9C7F_0E1EAEF9B78E
+#endif // STD_AF26FDB8_0F80_44F9_BBDB_3BC8BEB16454
 

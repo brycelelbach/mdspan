@@ -69,7 +69,7 @@ void test_1d_static()
     // Set every Nth element to 17. 
     for (auto i = 0; i < sub_l[0]; ++i)
     {
-        auto const s = sub_l.stepping();
+        auto const s = sub_l.steps();
         auto const true_idx = (s[0] * i);
 
         BOOST_TEST_EQ((sub_l.index(i)), true_idx);
@@ -87,7 +87,7 @@ void test_1d_static()
         BOOST_TEST_EQ((l.index(i)), i);
 
         // Element not in the strided sub-box.
-        if (0 == (i % sub_l.stepping()[0]))
+        if (0 == (i % sub_l.steps()[0]))
         {
             BOOST_TEST_EQ((dptr[l.index(i)]), 17);
         }
@@ -133,7 +133,7 @@ void test_1d_dynamic()
     // Set every Nth element to 17. 
     for (auto i = 0; i < sub_l[0]; ++i)
     {
-        auto const s = sub_l.stepping();
+        auto const s = sub_l.steps();
         auto const true_idx = (s[0] * i);
 
         BOOST_TEST_EQ((sub_l.index(i)), true_idx);
@@ -154,7 +154,7 @@ void test_1d_dynamic()
         BOOST_TEST_EQ((l.index(i)), i);
 
         // Element in the strided sub-box.
-        if (0 == (i % sub_l.stepping()[0]))
+        if (0 == (i % sub_l.steps()[0]))
         {
             BOOST_TEST_EQ((dptr[l.index(i)]), 17);
 
@@ -223,7 +223,7 @@ void test_2d_static()
     for (auto j = 0; j < sub_l[1]; ++j)
     for (auto i = 0; i < sub_l[0]; ++i)
     {
-        auto const s = sub_l.stepping();
+        auto const s = sub_l.steps();
         auto const true_idx = (s[0] * i) + (sub_l[0] * s[0]) * (s[1] * j);
 
         BOOST_TEST_EQ((sub_l.index(i, j)), true_idx);
@@ -244,8 +244,8 @@ void test_2d_static()
         BOOST_TEST_EQ((l.index(i, j)), true_idx);
 
         // Element in the strided sub-box.
-        if (  (0 == (i % sub_l.stepping()[0]))
-           && (0 == (j % sub_l.stepping()[1]))
+        if (  (0 == (i % sub_l.steps()[0]))
+           && (0 == (j % sub_l.steps()[1]))
            )
         {
             BOOST_TEST_EQ((dptr[l.index(i, j)]), 17);
@@ -296,7 +296,7 @@ void test_2d_dynamic()
     for (auto j = 0; j < sub_l[1]; ++j)
     for (auto i = 0; i < sub_l[0]; ++i)
     {
-        auto const s = sub_l.stepping();
+        auto const s = sub_l.steps();
         auto const true_idx = (s[0] * i) + (sub_l[0] * s[0]) * (s[1] * j);
 
         BOOST_TEST_EQ((sub_l.index(i, j)), true_idx);
@@ -320,8 +320,8 @@ void test_2d_dynamic()
         BOOST_TEST_EQ((l.index(i, j)), true_idx);
 
         // Element in the strided sub-box.
-        if (  (0 == (i % sub_l.stepping()[0]))
-           && (0 == (j % sub_l.stepping()[1]))
+        if (  (0 == (i % sub_l.steps()[0]))
+           && (0 == (j % sub_l.steps()[1]))
            )
         {
             BOOST_TEST_EQ((dptr[l.index(i, j)]), 17);

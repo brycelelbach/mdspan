@@ -226,7 +226,7 @@ struct integral_pair;
 
 // Compile-time sorting predicates.
 
-// Metafunction class with an ambedded apply<T0, T1> metafunction that returns
+// Metafunction class with an embedded apply<T0, T1> metafunction that returns
 // true if T0::key is less than T1::key. 
 struct type_key_less;
 
@@ -439,12 +439,28 @@ struct layout_mapping_regular_base;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct make_regular_ordering_left;
+// These metafunction class definitions need to be defined in the forwarding
+// header because some of the template aliases here use their embedded template,
+// and template aliases cannot be forward-declared.
 
-struct make_regular_ordering_right;
+struct make_regular_ordering_left
+{
+    template <typename Dimensions>
+    using apply = make_index_sequence<Dimensions::rank()>;
+};
+
+struct make_regular_ordering_right
+{
+    template <typename Dimensions>
+    using apply = make_reversed_index_sequence<Dimensions::rank()>;
+};
 
 template <std::size_t... OrderIndices>
-struct make_regular_ordering_explicit;
+struct make_regular_ordering_explicit
+{
+    template <typename Dimensions>
+    using apply = index_sequence<OrderIndices...>;
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -487,12 +503,12 @@ struct dimensions;
 
 // TODO: Specify ArrayRefLayout concept which these classes implement.
 
-template <
-    typename Dimensions
-  , typename Striding
-  , typename Padding
-    >
-struct layout_mapping_left;
+//template <
+//    typename Dimensions
+//  , typename Striding
+//  , typename Padding
+//    >
+//struct layout_mapping_left;
 
 template <
     typename Dimensions
@@ -501,7 +517,7 @@ template <
     >
 struct layout_mapping_right; 
 
-struct layout_left;
+//struct layout_left;
 
 struct layout_right; 
 
@@ -541,17 +557,60 @@ using layout_regular_precomputed_strides = detail::layout_regular_impl<
     layout_mapping_regular_precomputed_strides
   , detail::make_regular_ordering_explicit<OrderIndices...>
 >;
-
 template <std::size_t... OrderIndices>
 using layout_regular_on_demand_strides = detail::layout_regular_impl<
     layout_mapping_regular_on_demand_strides
   , detail::make_regular_ordering_explicit<OrderIndices...>
 >;
-
 template <std::size_t... OrderIndices>
 using layout_regular = detail::layout_regular_impl<
     layout_mapping_regular
   , detail::make_regular_ordering_explicit<OrderIndices...>
+>;
+
+template <
+    typename Dimensions
+  , typename Steps
+  , typename Pads
+    >
+using layout_mapping_left_precomputed_strides =
+    layout_mapping_regular_precomputed_strides<
+        Dimensions, Steps, Pads
+      , typename detail::make_regular_ordering_left::template apply<Dimensions> 
+    >;
+template <
+    typename Dimensions
+  , typename Steps
+  , typename Pads
+    >
+using layout_mapping_left_on_demand_strides =
+    layout_mapping_regular_on_demand_strides<
+        Dimensions, Steps, Pads
+      , typename detail::make_regular_ordering_left::template apply<Dimensions> 
+    >;
+template <
+    typename Dimensions
+  , typename Steps
+  , typename Pads
+    >
+using layout_mapping_left =
+    layout_mapping_regular_precomputed_strides<
+        Dimensions, Steps, Pads
+      , typename detail::make_regular_ordering_left::template apply<Dimensions> 
+    >;
+
+using layout_left_precomputed_strides = detail::layout_regular_impl<
+    layout_mapping_regular_precomputed_strides
+  , detail::make_regular_ordering_left
+>;
+// TODO
+//using layout_left_on_demand_strides = detail::layout_regular_impl<
+//    layout_mapping_regular_on_demand_strides
+//  , detail::make_regular_ordering_left
+//>;
+using layout_left = detail::layout_regular_impl<
+    layout_mapping_regular
+  , detail::make_regular_ordering_left
 >;
 
 ///////////////////////////////////////////////////////////////////////////////
