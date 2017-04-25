@@ -174,8 +174,7 @@ inline constexpr std::size_t index_into_dynamic_dims(
     Idx idx, Head head, Tail... tail
     ) noexcept;
 
-// Initialize dynamic dims storage from a parameter pack of dims that include
-// static dims.
+// Initialize dimensions from a parameter pack of both static and dynamic dims.
 
 // Base case.
 template <typename Idx, typename DynamicDimsArray>

@@ -21,24 +21,10 @@ struct dimensions
     ///////////////////////////////////////////////////////////////////////////
     // TYPES
 
+    using dynamic_dims_array = detail::make_dynamic_dims_array_t<Dims...>;
+
     using value_type = std::size_t;
     using size_type  = std::size_t;
-
-    /////////////////////////////////////////////////////////////////////////// 
-    // CONSTRUCTORS AND ASSIGNMENT OPERATORS
-
-    constexpr dimensions() noexcept;
-
-    constexpr dimensions(dimensions const&) noexcept = default;
-    constexpr dimensions(dimensions&&) noexcept = default;
-    dimensions& operator=(dimensions const&) noexcept = default;
-    dimensions& operator=(dimensions&&) noexcept = default;
-
-    template <typename... DynamicDims>
-    constexpr dimensions(DynamicDims... ddims) noexcept;
-
-    template <std::size_t N>
-    constexpr dimensions(array<value_type, N> a) noexcept;
 
     /////////////////////////////////////////////////////////////////////////// 
     // RANK, SIZE AND EXTENT 
@@ -54,6 +40,38 @@ struct dimensions
     // is out of bound. Currently, you get 0.
     template <typename IntegralType>
     constexpr value_type operator[](IntegralType idx) const noexcept;
+
+    /////////////////////////////////////////////////////////////////////////// 
+    // CONSTRUCTORS AND ASSIGNMENT OPERATORS
+
+    constexpr dimensions() noexcept;
+
+    constexpr dimensions(dimensions const&) noexcept = default;
+    constexpr dimensions(dimensions&&) noexcept = default;
+    dimensions& operator=(dimensions const&) noexcept = default;
+    dimensions& operator=(dimensions&&) noexcept = default;
+
+    // Construct from a parameter pack of dynamic dimensions.
+    template <
+        typename... DynamicDims
+      , typename enable_if<
+            rank_dynamic() == sizeof...(DynamicDims)
+        >::type* = nullptr 
+    >
+    constexpr dimensions(DynamicDims... ddims) noexcept;
+
+    // Construct from a parameter pack of static and dynamic dimensions.
+    template <
+        typename... StaticAndDynamicDims
+      , typename enable_if<
+            (rank() != rank_dynamic()) // The above ctor handles this case.
+         && (rank() == sizeof...(StaticAndDynamicDims))
+        >::type* = nullptr
+    >
+    constexpr dimensions(StaticAndDynamicDims... sddims) noexcept;
+
+    template <std::size_t N>
+    constexpr dimensions(array<value_type, N> a) noexcept;
 
   private:
 
@@ -75,7 +93,7 @@ struct dimensions
 
     ///////////////////////////////////////////////////////////////////////////
 
-    detail::make_dynamic_dims_array_t<Dims...> dynamic_dims_;
+    dynamic_dims_array dynamic_dims_;
 };
 
 
@@ -88,7 +106,12 @@ dimensions<Dims...>::dimensions() noexcept
   : dynamic_dims_{} {}
 
 template <std::size_t... Dims>
-template <typename... DynamicDims>
+template <
+    typename... DynamicDims
+  , typename enable_if<
+        dimensions<Dims...>::rank_dynamic() == sizeof...(DynamicDims)
+    >::type* 
+>
 constexpr
 dimensions<Dims...>::dimensions(DynamicDims... ddims) noexcept
   // FIXME: We cast here to avoid a narrowing conversion warning from GCC.
@@ -99,10 +122,28 @@ dimensions<Dims...>::dimensions(DynamicDims... ddims) noexcept
         detail::is_integral_pack<DynamicDims...>::value
       , "Non-integral types passed to dimensions<> constructor."
     );
+}
+
+template <std::size_t... Dims>
+template <
+    typename... StaticAndDynamicDims
+  , typename enable_if<
+        (dimensions<Dims...>::rank() != dimensions<Dims...>::rank_dynamic())
+     && (dimensions<Dims...>::rank() == sizeof...(StaticAndDynamicDims))
+    >::type*
+>
+constexpr
+dimensions<Dims...>::dimensions(StaticAndDynamicDims... sddims) noexcept
+  : dynamic_dims_{
+        detail::filter_initialize_dynamic_dims_array<Dims...>(
+            0, dynamic_dims_array{{}}, sddims...
+        )
+    }
+{
     static_assert(
-        detail::count_dynamic_dims<Dims...>::value == sizeof...(DynamicDims)
-      , "Incorrect number of dynamic dimensions passed to dimensions<>."
-        );
+        detail::is_integral_pack<StaticAndDynamicDims...>::value
+      , "Non-integral types passed to dimensions<> constructor."
+    );
 }
 
 template <std::size_t... Dims>
@@ -173,7 +214,9 @@ dimensions<Dims...>::product_extents(Idx idx) const noexcept
 template <std::size_t... Dims>
 template <typename Idx, typename Head, typename... Tail>
 inline constexpr typename dimensions<Dims...>::size_type
-dimensions<Dims...>::product_extents(Idx idx, Head head, Tail... tail) const noexcept
+dimensions<Dims...>::product_extents(
+    Idx idx, Head head, Tail... tail
+    ) const noexcept
 {
     return (head == dyn ? (*this)[idx] : head)
          * product_extents(idx + 1, tail...);
@@ -204,6 +247,8 @@ inline constexpr std::size_t dynamic_extent(
            );        
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 // Base case.
 template <typename Idx>
 inline constexpr std::size_t index_into_dynamic_dims(
@@ -225,6 +270,8 @@ inline constexpr std::size_t index_into_dynamic_dims(
         : index_into_dynamic_dims((idx != 0 ? idx - 1 : idx), tail...)
         );
 }
+
+///////////////////////////////////////////////////////////////////////////////
 
 template <typename Idx, typename DynamicDimsArray>
 inline constexpr DynamicDimsArray filter_initialize_dynamic_dims_array(
