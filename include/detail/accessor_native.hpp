@@ -10,7 +10,8 @@
 
 #include <type_traits>
 
-namespace std { namespace experimental  {
+namespace std { namespace experimental
+{
 
 template <typename ValueType>
 struct accessor_native

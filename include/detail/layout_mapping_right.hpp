@@ -14,7 +14,8 @@
 
 //#warning Rename to layout_right_mapping
 
-namespace std { namespace experimental {
+namespace std { namespace experimental
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -192,7 +193,8 @@ layout_mapping_right<Dimensions, Stepping, Padding>::index(
 
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace detail {
+namespace detail
+{
 
 // Recursive row-major layout implementation.
 //

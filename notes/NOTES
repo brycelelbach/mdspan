@@ -102,3 +102,5 @@ dimensions and derivers of dimensions need comparison operators.
  
 is_rank_* - All of these could be constexpr functions instead.
 
+Make a global size_type/index_type alias
+

@@ -11,7 +11,8 @@
 #include <type_traits>
 #include <cstdint>
 
-namespace std { namespace experimental { namespace detail {
+namespace std { namespace experimental { namespace detail
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -426,6 +427,22 @@ template <
     >
 struct layout_mapping_right_indexer;
 
+///////////////////////////////////////////////////////////////////////////////
+
+template <
+    typename Dimensions
+  , typename Steps
+  , typename Pads
+  , typename Ordering
+    >
+struct layout_mapping_regular_base;
+
+template <
+    template <typename, typename, typename, typename> class LayoutMapping
+  , std::size_t... OrderIndices
+>
+struct layout_regular_impl;
+
 } // std::experimental::detail
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -439,7 +456,8 @@ using extract_dimensions_t = typename extract_dimensions<T>::type;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace detail {
+namespace detail
+{
 
 struct all_tag {};
 
@@ -476,11 +494,51 @@ struct layout_left;
 
 struct layout_right; 
 
-// TODO
-template <std::size_t... Ordering>
-struct layout_order;
-
 using layout_native = layout_right;
+
+///////////////////////////////////////////////////////////////////////////////
+
+template <
+    typename Dimensions
+  , typename Steps
+  , typename Pads
+  , typename Ordering
+    >
+struct layout_mapping_regular_precomputed_strides;
+
+// TODO
+template <
+    typename Dimensions
+  , typename Steps
+  , typename Pads
+  , typename Ordering
+    >
+struct layout_mapping_regular_on_demand_strides;
+
+template <
+    typename Dimensions
+  , typename Steps
+  , typename Pads
+  , typename Ordering
+    >
+using layout_mapping_regular = layout_mapping_regular_precomputed_strides<
+    Dimensions, Steps, Pads, Ordering
+>;
+
+template <std::size_t... OrderIndices>
+using layout_regular_precomputed_strides = detail::layout_regular_impl<
+    layout_mapping_regular_precomputed_strides, OrderIndices...
+>;
+
+template <std::size_t... OrderIndices>
+using layout_regular_on_demand_strides = detail::layout_regular_impl<
+    layout_mapping_regular_on_demand_strides, OrderIndices...
+>;
+
+template <std::size_t... OrderIndices>
+using layout_regular = detail::layout_regular_impl<
+    layout_mapping_regular, OrderIndices...
+>;
 
 ///////////////////////////////////////////////////////////////////////////////
 

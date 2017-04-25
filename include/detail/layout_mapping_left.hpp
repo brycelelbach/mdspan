@@ -16,7 +16,8 @@
 
 //#warning Better coverage for stepping() and padding()
 
-namespace std { namespace experimental {
+namespace std { namespace experimental
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -198,7 +199,8 @@ layout_mapping_left<Dimensions, Stepping, Padding>::index(
 
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace detail {
+namespace detail
+{
 
 // Recursive column-major layout implementation.
 //

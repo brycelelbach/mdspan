@@ -10,7 +10,8 @@
 
 #include "detail/fwd.hpp"
 
-namespace std { namespace experimental { namespace detail  {
+namespace std { namespace experimental { namespace detail
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 

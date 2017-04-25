@@ -12,7 +12,8 @@
 
 #include <type_traits>
 
-namespace std { namespace experimental { namespace detail {
+namespace std { namespace experimental { namespace detail
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 

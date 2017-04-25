@@ -9,14 +9,18 @@
 #define STD_1147DB06_B234_4218_9C7F_0E1EAEF9B78E
 
 #include "detail/fwd.hpp"
-#include "detail/layout_mapping_left.hpp"
+#include "detail/integer_sequence.hpp"
 
-namespace std { namespace experimental
+namespace std { namespace experimental { namespace detail
 {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-struct layout_left
+template <
+    template <typename, typename, typename, typename> typename LayoutMapping
+  , std::size_t... OrderIndices
+>
+struct layout_regular_impl
 {
     template <std::size_t... Steps>
     struct stepping
@@ -25,20 +29,22 @@ struct layout_left
         struct padding
         {
             // Striding specified, padding specified.
-            template <typename Dims>
-            using mapping = layout_mapping_left<
-                Dims
+            template <typename Dimensions>
+            using mapping = LayoutMapping<
+                Dimensions
               , dimensions<Steps...>
-              , dimensions<Pads...> 
+              , dimensions<Pads...>
+              , index_sequence<OrderIndices...> 
             >;
         };
 
         // Striding specified, padding defaulted.
-        template <typename Dims>
-        using mapping = layout_mapping_left<
-            Dims
+        template <typename Dimensions>
+        using mapping = LayoutMapping<
+            Dimensions
           , dimensions<Steps...>
-          , detail::make_filled_dims_t<Dims::rank(), 0>
+          , detail::make_filled_dims_t<Dimensions::rank(), 0>
+          , index_sequence<OrderIndices...> 
         >;
     };
 
@@ -49,29 +55,32 @@ struct layout_left
         struct stepping
         {
             // Striding specified, padding specified.
-            template <typename Dims>
-            using mapping = layout_mapping_left<
-                Dims
+            template <typename Dimensions>
+            using mapping = LayoutMapping<
+                Dimensions
               , dimensions<Steps...>
               , dimensions<Pads...> 
+              , index_sequence<OrderIndices...> 
             >;
         };
 
         // Striding defaulted, padding specified.
-        template <typename Dims>
-        using mapping = layout_mapping_left<
-            Dims
-          , detail::make_filled_dims_t<Dims::rank(), 1>
+        template <typename Dimensions>
+        using mapping = LayoutMapping<
+            Dimensions
+          , detail::make_filled_dims_t<Dimensions::rank(), 1>
           , dimensions<Pads...>
+          , index_sequence<OrderIndices...> 
         >;
     };
 
     // Striding defaulted, padding defaulted.
-    template <typename Dims>
-    using mapping = layout_mapping_left<
-        Dims
-      , detail::make_filled_dims_t<Dims::rank(), 1>
-      , detail::make_filled_dims_t<Dims::rank(), 0>
+    template <typename Dimensions>
+    using mapping = LayoutMapping<
+        Dimensions
+      , detail::make_filled_dims_t<Dimensions::rank(), 1>
+      , detail::make_filled_dims_t<Dimensions::rank(), 0>
+      , index_sequence<OrderIndices...> 
     >;
 };
 

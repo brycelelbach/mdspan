@@ -14,17 +14,10 @@
 
 #include "detail/layout_mapping_regular_base.hpp"
 
-namespace std { namespace experimental { namespace detail {
+namespace std { namespace experimental
+{
 
 ///////////////////////////////////////////////////////////////////////////////
-
-template <
-    typename Dimensions
-  , typename Steps
-  , typename Pads
-  , typename Ordering
-    >
-struct layout_mapping_regular_precomputed_strides;
 
 template <
     typename Dimensions
@@ -37,7 +30,7 @@ struct layout_mapping_regular_precomputed_strides<
   , Steps
   , Pads
   , index_sequence<OrderIndices...>
-> : layout_mapping_regular_base<
+> : detail::layout_mapping_regular_base<
     Dimensions
   , Steps
   , Pads
@@ -47,7 +40,7 @@ struct layout_mapping_regular_precomputed_strides<
     ///////////////////////////////////////////////////////////////////////////
     // TYPES
 
-    using base_type = layout_mapping_regular_base<
+    using base_type = detail::layout_mapping_regular_base<
         Dimensions
       , Steps
       , Pads
@@ -419,7 +412,7 @@ inline constexpr typename layout_mapping_regular_precomputed_strides<
 
 ///////////////////////////////////////////////////////////////////////////////
 
-}}} // std::experimental::detail
+}} // std::experimental
 
 #endif // STD_8AD8FE21_620B_4E38_BE74_D34624F192B0
 

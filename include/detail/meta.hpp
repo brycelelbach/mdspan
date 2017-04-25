@@ -18,7 +18,8 @@
 #include "detail/integer_sequence.hpp"
 #include "detail/meta_logical_operators.hpp"
 
-namespace std {
+namespace std
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -48,7 +49,8 @@ template <typename... Params, unsigned ND>
 struct extent<experimental::mdspan<Params...>, ND>
   : extent<typename experimental::mdspan<Params...>::dimensions, ND> {};
 
-namespace experimental { namespace detail {
+namespace experimental { namespace detail
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -31,7 +31,8 @@
 #include "detail/meta.hpp"
 #include "detail/dimensions.hpp"
 
-namespace std { namespace experimental { namespace detail {
+namespace std { namespace experimental { namespace detail
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -28,7 +28,8 @@
 
 //#warning Add rank_static()?
 
-namespace std { namespace experimental {
+namespace std { namespace experimental
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 
