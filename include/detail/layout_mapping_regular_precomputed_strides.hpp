@@ -131,10 +131,10 @@ struct layout_mapping_regular_precomputed_strides<
         typename Dimensions::size_type    Rank
       , typename Dimensions::size_type... IdxDims
         >
-    constexpr typename enable_if<
+    constexpr detail::enable_if_t<
          detail::is_rank_unit_stride<Rank, Dimensions, ordering>::value
       , size_type
-    >::type
+    >
     compute_index(dimensions<IdxDims...> i) const noexcept
     { // {{{
         static_assert(
@@ -148,10 +148,10 @@ struct layout_mapping_regular_precomputed_strides<
         typename Dimensions::size_type    Rank
       , typename Dimensions::size_type... IdxDims
         >
-    constexpr typename enable_if<
+    constexpr detail::enable_if_t<
         !detail::is_rank_unit_stride<Rank, Dimensions, ordering>::value
       , size_type
-    >::type
+    >
     compute_index(dimensions<IdxDims...> i) const noexcept
     { // {{{
         static_assert(
@@ -401,10 +401,8 @@ inline constexpr typename layout_mapping_regular_precomputed_strides<
     ) const noexcept
 {
     return ( is_dynamic_stride(Rank)
-           ? base_type::computed_static_stride_[rto(Rank)]
-           : base_type::template compute_stride<Rank>(
-                d, s, p, stride_
-             )
+           ? base_type::template compute_stride<Rank>(d, s, p, stride_)
+           : base_type::computed_static_stride_[rto(Rank)]
            );
 }
 
