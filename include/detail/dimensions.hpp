@@ -102,7 +102,6 @@ struct dimensions
               , decltype(
                     declval<Generator>()(
                         declval<integral_constant<size_type, 0>>()
-                      , declval<integral_constant<value_type, 0>>()
                     )
                 )
             >::value
@@ -113,7 +112,7 @@ struct dimensions
     // {{{
       : dimensions(
             std::forward<Generator>(g)
-          , detail::make_index_sequence<sizeof...(Dims)>{}
+          , detail::make_dynamic_dims_indices<Dims...>{}
         )
     {} // }}}
 
@@ -121,7 +120,7 @@ struct dimensions
 
     template <
         typename Generator
-      , std::size_t... RankIndices 
+      , std::size_t... DynamicDimIndices 
         // {{{ SFINAE condition
       , detail::enable_if_t<
             is_same<
@@ -129,7 +128,6 @@ struct dimensions
               , decltype(
                     declval<Generator>()(
                         declval<integral_constant<size_type, 0>>()
-                      , declval<integral_constant<value_type, 0>>()
                     )
                 )
             >::value
@@ -138,15 +136,10 @@ struct dimensions
     >
     constexpr dimensions(
         Generator&& g
-      , detail::index_sequence<RankIndices...>
+      , detail::index_sequence<DynamicDimIndices...>
         ) noexcept
     // {{{
-      : dynamic_dims_{{
-            g(
-                integral_constant<size_type, RankIndices>{}
-              , integral_constant<value_type, Dims>{}
-            )...
-        }}
+      : dynamic_dims_{{g(integral_constant<size_type, DynamicDimIndices>{})...}}
     {} // }}}
 
     ///////////////////////////////////////////////////////////////////////////
