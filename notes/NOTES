@@ -109,3 +109,10 @@ What's the deal with {} vs () for initialization.
 Rename dimensions to dimensions_impl and make it take an extra parameter (a make_index_sequence so the pack is accessible) and add a dimensions template alias.
 
 Rename is_dynamic_stride to is_stride_dynamic
+
+Fix unit tests to include only what they need
+
+Set up Circle CI
+
+Add macros for the namespace and default to boost
+
