@@ -95,14 +95,24 @@ struct layout_mapping_regular_precomputed_strides<
 
     using base_type::otr;
     using base_type::rto;
+
     using base_type::is_regular;
+
     using base_type::is_dynamic_stride;
+
+    using base_type::stride_static;
+
+/* FIXME
+    using base_type::strides_static;
+*/
 
     constexpr size_type stride(size_type rank) const noexcept;
 
-    constexpr dimensions<base_type::computed_static_stride_[otr(OrderIndices)]...>
+/* FIXME
+    constexpr dimensions<...>
     strides() const noexcept;
-    
+*/
+   
     template <typename... Indices>
     constexpr size_type index(Indices... indices) const noexcept;
 
@@ -110,9 +120,41 @@ struct layout_mapping_regular_precomputed_strides<
     constexpr size_type index(dimensions<IdxDims...> i) const noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
+
+  protected:
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    using base_type::compute_stride;
+
+    ///////////////////////////////////////////////////////////////////////////
+
   private:
 
     ///////////////////////////////////////////////////////////////////////////
+
+    struct dynamic_stride_generator
+    {
+        using layout_mapping = layout_mapping_regular_precomputed_strides;
+
+        constexpr dynamic_stride_generator(layout_mapping& lm) noexcept
+        // {{{
+          : lm_(lm) {}
+        // }}}
+
+        template <size_type Rank>
+        constexpr value_type operator()(
+            integral_constant<size_type,  Rank>
+            ) noexcept
+        { // {{{
+            return lm_.template compute_stride<Rank>(
+                lm_, lm_.steps(), lm_.pads(), lm_.stride_
+            );
+        } // }}}
+
+      private:
+        layout_mapping& lm_;
+    };
 
     template <typename Dimensions::size_type Rank>
     constexpr size_type compute_dynamic_stride(
@@ -122,6 +164,8 @@ struct layout_mapping_regular_precomputed_strides<
         ) const noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
+
+    // TODO: Move to layout_mapping_regular_base
 
     // Pass Rank as a template parameter instead of a function parameter to 
     // avoid recursion on the same function signature.
@@ -164,7 +208,7 @@ struct layout_mapping_regular_precomputed_strides<
     ///////////////////////////////////////////////////////////////////////////
 
     // Indexed by order, not rank.
-    dimensions<base_type::computed_static_stride_[OrderIndices]...> stride_;
+    dimensions<stride_static(otr(OrderIndices))...> stride_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -200,7 +244,8 @@ constexpr layout_mapping_regular_precomputed_strides<
 >::layout_mapping_regular_precomputed_strides(ForwardDims&&... fdims) noexcept
   : base_type(std::forward<ForwardDims>(fdims)...)
   , stride_(
-        compute_dynamic_stride<otr(OrderIndices)>(*this, Steps(), Pads())...
+//        compute_dynamic_stride<otr(OrderIndices)>(*this, Steps(), Pads())...
+        dynamic_stride_generator(*this)
     )
 {}
 
@@ -219,7 +264,8 @@ constexpr layout_mapping_regular_precomputed_strides<
 >::layout_mapping_regular_precomputed_strides(array<value_type, N> a) noexcept
   : base_type(a)
   , stride_(
-        compute_dynamic_stride<otr(OrderIndices)>(*this, Steps(), Pads())...
+//        compute_dynamic_stride<otr(OrderIndices)>(*this, Steps(), Pads())...
+        dynamic_stride_generator(*this)
     )
 {}
 
@@ -239,7 +285,8 @@ constexpr layout_mapping_regular_precomputed_strides<
     ) noexcept
   : base_type(d, s, p)
   , stride_(
-        compute_dynamic_stride<otr(OrderIndices)>(d, s, p)...
+//        compute_dynamic_stride<otr(OrderIndices)>(d, s, p)...
+        dynamic_stride_generator(*this)
     )
 {}
 
@@ -257,7 +304,8 @@ constexpr layout_mapping_regular_precomputed_strides<
 >::layout_mapping_regular_precomputed_strides(Dimensions d) noexcept
   : base_type(d)
   , stride_(
-        compute_dynamic_stride<otr(OrderIndices)>(d, Steps(), Pads())...
+//        compute_dynamic_stride<otr(OrderIndices)>(d, Steps(), Pads())...
+        dynamic_stride_generator(*this)
     )
 {}
 
@@ -284,6 +332,7 @@ inline constexpr typename layout_mapping_regular_precomputed_strides<
     return stride_[rto(rank)];
 }
 
+/* FIXME
 template <
     typename Dimensions
   , typename Steps
@@ -311,8 +360,9 @@ inline constexpr dimensions<
           , Pads
           , detail::index_sequence<OrderIndices...>
         >::computed_static_stride_[otr(OrderIndices)]...
-    >(otr(OrderIndices)...); 
+    >(stride(otr(OrderIndices))...); 
 }
+*/
 
 template <
     typename Dimensions
@@ -373,6 +423,7 @@ layout_mapping_regular_precomputed_strides<
 
 ///////////////////////////////////////////////////////////////////////////////
 
+/*
 template <
     typename Dimensions
   , typename Steps
@@ -395,16 +446,17 @@ inline constexpr typename layout_mapping_regular_precomputed_strides<
   , Pads
   , detail::index_sequence<OrderIndices...>
 >::compute_dynamic_stride(
-    Dimensions      d
+    Dimensions   d
   , Steps        s
   , Pads         p
     ) const noexcept
 {
     return ( is_dynamic_stride(Rank)
-           ? base_type::template compute_stride<Rank>(d, s, p, stride_)
-           : base_type::computed_static_stride_[rto(Rank)]
+           ? compute_stride<Rank>(d, s, p, stride_)
+           : computed_static_stride_[rto(Rank)]
            );
 }
+*/
 
 ///////////////////////////////////////////////////////////////////////////////
 
