@@ -140,13 +140,13 @@ struct layout_mapping_regular_base<
     ///////////////////////////////////////////////////////////////////////////
     // INDEXING
 
-    constexpr size_type stride_static(size_type rank) const noexcept
+    static constexpr size_type stride_static(size_type rank) noexcept
     { // {{{
         return computed_static_stride_[rto(rank)];
     } // }}}
 
 /* FIXME
-    constexpr dimensions<computed_static_stride_[otr(OrderIndices)]...>
+    static constexpr dimensions<computed_static_stride_[otr(OrderIndices)]...>
     strides_static() const noexcept
     { // {{{
         return dimensions<
@@ -184,8 +184,7 @@ struct layout_mapping_regular_base<
          is_rank_unit_stride<Rank, Dimensions, ordering>::value, bool
     > compute_is_dynamic_stride() noexcept
     { // {{{
-        return Dimensions::is_dynamic(Rank)
-            || Pads::is_dynamic(Rank) || Steps::is_dynamic(Rank);
+        return Pads::is_dynamic(Rank) || Steps::is_dynamic(Rank);
     } // }}}
 
     template <typename Dimensions::size_type Rank>
@@ -200,7 +199,7 @@ struct layout_mapping_regular_base<
         // We don't use is_dynamic_stride here because GCC chokes on it when
         // calling this function at constexpr time. 
         return computed_is_dynamic_stride_[rto(Rank) - 1]
-            || Dimensions::is_dynamic(Rank)
+            || Dimensions::is_dynamic(otr(rto(Rank) - 1))
             || Pads::is_dynamic(Rank) || Steps::is_dynamic(Rank);
     } // }}}
 
