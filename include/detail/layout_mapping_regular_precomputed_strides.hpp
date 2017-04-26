@@ -145,7 +145,7 @@ struct layout_mapping_regular_precomputed_strides<
         template <size_type Rank>
         constexpr value_type operator()(
             integral_constant<size_type,  Rank>
-            ) noexcept
+            ) const noexcept
         { // {{{
             return lm_.template compute_stride<Rank>(
                 lm_, lm_.steps(), lm_.pads(), lm_.stride_
