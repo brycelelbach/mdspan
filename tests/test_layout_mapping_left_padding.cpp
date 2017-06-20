@@ -28,8 +28,12 @@ void test_2d_static()
 
     BOOST_TEST_EQ((l.is_regular()), true);
 
+    BOOST_TEST_EQ((l.is_dynamic_stride(0)), false);
+    BOOST_TEST_EQ((l.is_dynamic_stride(1)), false);
+
     BOOST_TEST_EQ((l.stride(0)), 1);
-    BOOST_TEST_EQ((l.stride(1)), 1);
+
+    BOOST_TEST_EQ((l.stride(1)), N + X);
 
     BOOST_TEST_EQ((l.size()), X * Y);
     BOOST_TEST_EQ((l.span()), (X + N) * (Y + M));
@@ -40,7 +44,7 @@ void test_2d_static()
     for (auto j = 0; j < l[1]; ++j)
     for (auto i = 0; i < l[0]; ++i)
     {
-        auto const true_idx = (i) + (l[0] + l.pads()[0]) * (j);
+        auto const true_idx = (i) + (l.pads()[0] + l[0]) * (j);
 
         BOOST_TEST_EQ((l.index(i, j)), true_idx);
 
@@ -55,7 +59,7 @@ void test_2d_static()
     for (auto j = 0; j < l[1] + l.pads()[1]; ++j)
     for (auto i = 0; i < l[0] + l.pads()[0]; ++i)
     {
-        auto const true_idx = (i) + (l[0] + l.pads()[0]) * (j);
+        auto const true_idx = (i) + (l.pads()[0] + l[0]) * (j);
 
         BOOST_TEST_EQ((l.index(i, j)), true_idx);
 
@@ -82,7 +86,7 @@ void test_2d_static()
     for (auto j = 0; j < l[1] + l.pads()[1]; ++j)
     for (auto i = 0; i < l[0] + l.pads()[0]; ++i)
     {
-        auto const true_idx = (i) + (l[0] + l.pads()[0]) * (j);
+        auto const true_idx = (i) + (l.pads()[0] + l[0]) * (j);
 
         BOOST_TEST_EQ((l.index(i, j)), true_idx);
 
@@ -117,14 +121,17 @@ void test_2d_dynamic()
 
     BOOST_TEST_EQ((l.is_regular()), true);
 
+    BOOST_TEST_EQ((l.is_dynamic_stride(0)), false);
+    BOOST_TEST_EQ((l.is_dynamic_stride(1)), true);
+
     BOOST_TEST_EQ((l.stride(0)), 1);
-    BOOST_TEST_EQ((l.stride(1)), 1);
+    BOOST_TEST_EQ((l.stride(1)), N + X);
 
     BOOST_TEST_EQ((l.size()), X * Y);
     BOOST_TEST_EQ((l.span()), (X + N) * (Y + M));
 
     // Initialize all elements to 42.
-    std::vector<int> data(
+    vector<int> data(
         (l[0] + l.pads()[0]) * (l[1] + l.pads()[1]), 42
     );
     int* dptr = data.data();
@@ -133,7 +140,7 @@ void test_2d_dynamic()
     for (auto j = 0; j < l[1] + l.pads()[1]; ++j)
     for (auto i = 0; i < l[0] + l.pads()[0]; ++i)
     {
-        auto const true_idx = (i) + (l[0] + l.pads()[0]) * (j);
+        auto const true_idx = (i) + (l.pads()[0] + l[0]) * (j);
 
         BOOST_TEST_EQ((l.index(i, j)), true_idx);
 
@@ -164,7 +171,7 @@ void test_2d_dynamic()
     for (auto j = 0; j < l[1] + l.pads()[1]; ++j)
     for (auto i = 0; i < l[0] + l.pads()[0]; ++i)
     {
-        auto const true_idx = i + j * (l[0] + N);
+        auto const true_idx = (i) + (l.pads()[0] + l[0]) * (j);
 
         BOOST_TEST_EQ((l.index(i, j)), true_idx);
 
