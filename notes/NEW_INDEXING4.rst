@@ -11,12 +11,12 @@ rto := rank index to ordering (smallest stride dimension to largest stride dimen
 otr := ordering to rank index (smallest rank index to largest rank index)
 
 stride[otr[0]] = s[otr[0]]
-stride[i]      = p[otr[rto[i]-1]] + s[i] * d[otr[rto[i]-1]] * stride[otr[rto[i]-1]]
-start at i = otr[n-1]
+stride[r]      = p[otr[rto[r]-1]] + s[r] * d[otr[rto[r]-1]] * stride[otr[rto[r]-1]]
+start at r = otr[n-1]
 
 index[otr[0]] = i[otr[0]] * stride[otr[0]]
-index[i]      = i[i]      * stride[i]      + index[otr[rto[i]-1]]
-start at i = otr[n-1]
+index[r]      = i[r]      * stride[r]      + index[otr[rto[r]-1]]
+start at r = otr[n-1]
 
 
 
