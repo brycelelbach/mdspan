@@ -116,3 +116,5 @@ Set up Circle CI
 
 Add macros for the namespace and default to boost
 
+std::sub_match inherits from std::pair, sets precedent for layout mappings inheriting from layout mappings.
+

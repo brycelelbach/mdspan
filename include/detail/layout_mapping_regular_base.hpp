@@ -13,19 +13,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // d   := dims
-// p   := pads
-// s   := steps
+// p   := padding 
+// s   := stepping
 // i   := index
-// rto := rank index to ordering (smallest to largest stride dimension)
-// otr := ordering to rank index (smallest to largest rank index, user provided)
+// n   := rank
+// rto := rank index to ordering (smallest stride dimension to largest stride dimension)
+// otr := ordering to rank index (smallest rank index to largest rank index)
 // 
-// stride[otr[0]] = p[otr[0]] + s[otr[0]]
-// stride[n]      = p[n]      + s[n]     d[otr[rto[n]-1]]stride[otr[rto[n]-1]]
-// start at n = otr[n]
+// stride[otr[0]] = s[otr[0]]
+// stride[i]      = p[otr[rto[i]-1]] + s[i] * d[otr[rto[i]-1]] * stride[otr[rto[i]-1]]
+// start at i = otr[n-1]
 // 
-// index[otr[0]] = i[otr[0]]stride[otr[0]]
-// index[n]      = i[n]     stride[n]      + index[otr[rto[n]-1]]
-// start at n = otr[n]
+// index[otr[0]] = i[otr[0]] * stride[otr[0]]
+// index[i]      = i[i]      * stride[i]      + index[otr[rto[i]-1]]
+// start at i = otr[n-1]
 
 #include "detail/fwd.hpp"
 #include "detail/meta.hpp"
@@ -184,7 +185,7 @@ struct layout_mapping_regular_base<
          is_rank_unit_stride<Rank, Dimensions, ordering>::value, bool
     > compute_is_dynamic_stride() noexcept
     { // {{{
-        return Pads::is_dynamic(Rank) || Steps::is_dynamic(Rank);
+        return Steps::is_dynamic(Rank);
     } // }}}
 
     template <typename Dimensions::size_type Rank>
@@ -200,7 +201,8 @@ struct layout_mapping_regular_base<
         // calling this function at constexpr time. 
         return computed_is_dynamic_stride_[rto(Rank) - 1]
             || Dimensions::is_dynamic(otr(rto(Rank) - 1))
-            || Pads::is_dynamic(Rank) || Steps::is_dynamic(Rank);
+            || Steps::is_dynamic(Rank)
+            || Pads::is_dynamic(otr(rto(Rank) - 1));
     } // }}}
 
     // Indexed by order, not rank.
@@ -225,7 +227,7 @@ struct layout_mapping_regular_base<
       , Arrayish const& last
         ) noexcept
     {
-        return p[Rank] + s[Rank];
+        return s[Rank];
     }
 
     template <typename Dimensions::size_type Rank, typename Arrayish>
@@ -238,7 +240,8 @@ struct layout_mapping_regular_base<
       , Arrayish const& last
         ) noexcept
     {
-        return p[Rank] + s[Rank] * d[otr(rto(Rank) - 1)] * last[rto(Rank) - 1];
+        return p[otr(rto(Rank) - 1)]
+             + s[Rank] * d[otr(rto(Rank) - 1)] * last[rto(Rank) - 1];
     }
 
     ///////////////////////////////////////////////////////////////////////////
