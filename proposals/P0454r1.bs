@@ -611,18 +611,17 @@ template <typename Mapping>
 objects pointed to be `ptr` with mapping `m`. If `ptr` is null or
 `m.size()` is 0, then an empty `basic_mdspan` is constructed.
 
-<!-- Can't use == here because comparison is not part of the requirements for Mapping -->
-*Postconditions:* `get_mapping()` returns a copy of `m`.
+*Postconditions:* `m == get_mapping()`
 
 *Complexity:* Constant.
 
 *Throws:* Nothing.
 
 *Remarks:* This constructor shall not participate in overload resolution if
-`!is_same_v<layout_mapping_type, remove_cv_t<remove_reference_t<Mapping>>`.
+`!is_convertible_v<Mapping, mapping_type>`
 
 ``` 
-template <typename Mapping>
+template <typename Mapping, typename Accessor>
   constexpr basic_mdspan(pointer ptr, Mapping&& l, Accessor&& a);
 ```
 
@@ -635,14 +634,14 @@ template <typename Mapping>
 objects pointed to be `ptr` with layout mapping `l` and accessor `a`. If `ptr`
 is null or `l.size()` is 0, then an empty `basic_mdspan` is constructed.
 
-*Postconditions:* `l == layout_mapping() && a == accessor()`.
+*Postconditions:* `l == get_mapping() && a == accessor()`.
 
 *Complexity:* Constant.
 
 *Throws:* Nothing.
 
 *Remarks:* This constructor shall not participate in overload resolution if
-`!is_same_v<layout_mapping_type, remove_cv_t<remove_reference_t<Mapping>> || !is_same_v<accessor_type, remove_cv_t<remove_reference_t<Accessor>>`.
+`!is_convertible_v<Mapping, mapping_type> || !is_convertible_v<Accessor, accessor_type>`. 
 
 ```
 template <class U>
@@ -660,7 +659,7 @@ equal to `extent(r)`, for all `r` in the range `[0, rank())`.
 
 *Effects:* Constructs an `basic_mdspan` by copying from another `basic_mdspan`.
 
-*Postconditions:* `other.layout_mapping() == layout_mapping() && other.accessor() == accessor() && reinterpret_cast<pointer>(other.data()) == data()`
+*Postconditions:* `other.get_mapping() == get_mapping() && other.accessor() == accessor() && reinterpret_cast<pointer>(other.data()) == data()`
 
 *Complexity:* Constant.
 
@@ -706,28 +705,28 @@ static constexpr index_type rank_dynamic() noexcept;
 constexpr bool is_dynamic(index_type r) const noexcept;
 ```
 
-*Effects:* Equivalent to `return get_layout_mapping().extents().is_dynamic(r);`
+*Effects:* Equivalent to `return get_mapping().extents().is_dynamic(r);`
 
 ```
 constexpr index_type extent(index_type r) const noexcept;
 ```
 
-*Effects:* Equivalent to `return get_layout_mapping().extents()[r];`
+*Effects:* Equivalent to `return get_mapping().extents()[r];`
 
 ```
 constexpr index_type size() const noexcept;
 ```
 
-*Effects:* Equivalent to `return get_layout_mapping().extents().size();`
+*Effects:* Equivalent to `return get_mapping().extents().size();`
 
 ```
 constexpr bool empty() const noexcept;
 ```
 
-*Effects:* Equivalent to `return get_layout_mapping().extents().empty();`
+*Effects:* Equivalent to `return get_mapping().extents().empty();`
 
 ```
-constexpr layout_mapping_type get_layout_mapping() const noexcept;
+constexpr mapping_type get_mapping() const noexcept;
 ```
 
 *Effects:* Returns a copy of the `basic_mdspan`'s layout mapping.
@@ -736,7 +735,7 @@ constexpr layout_mapping_type get_layout_mapping() const noexcept;
 constexpr index_type required_capacity() const noexcept;
 ```
 
-*Effects:* Equivalent to `return get_layout_mapping().span();`
+*Effects:* Equivalent to `return get_mapping().required_capacity();`
 
 ```
 constexpr accessor_type accessor() const noexcept;
@@ -749,7 +748,7 @@ template <class... Indices>
   reference operator()(Indices... is) const;
 ```
 
-*Effects:* Equivalent to `get_accessor()(data(), get_layout_mapping()(is...))`.
+*Effects:* Equivalent to `get_accessor()(data(), get_mapping()(is...))`.
 
 *Complexity:* Constant
 
@@ -774,7 +773,7 @@ template <class T, class Extents, class MappingPolicy, class AccessorPolicy>
 
 ```
 
-*Effects:* `other.layout_mapping() == get_layout_mapping() && other.accessor() == get_accessor() && other.data() == data()`.
+*Effects:* `other.get_mapping() == get_mapping() && other.accessor() == get_accessor() && other.data() == data()`.
 
 ```
 template <class T, class Extents, class MappingPolicy, class AccessorPolicy>
@@ -804,7 +803,7 @@ For each `R` in the range `[0, M.rank())` and for each `i[R]` be in the range `[
 Let `n = ((is_integral_v<decltype(SliceSpecifier)> ? 0 : 1) + ... + 0)`. `m.rank()` shall be `n`. [ *Note:* The new `mdspan`s rank is the number of non-integral specifiers. — *end note* ] 
 
 Let `r[y]` denote the `y`th `[0, M.rank())` such that `slice_spec[r]` is not an integral value. For each `j[r[y]]` be in the range `[0, M.extent(r))`:
-* For each element `e` in `M` that is in `m`, `M.get_layout_mapping()(i[0], ...) == m.get_layout_mapping()(j[0], ...)` is `true`.
+* For each element `e` in `M` that is in `m`, `M.get_mapping()(i[0], ...) == m.get_mapping()(j[0], ...)` is `true`.
 * If `slice_spec[r[y]]` is a braced-init-list, `m.extent(y) == slice_spec[y][1] - slice_spec[y][0]`.
 * If `slice_spec[r[y]]` is convertible to `tuple<index_type>` and `m.extent(y) == get<1>(slice_spec[r[y]]) - get<0>(slice_spec[r[y]]))`.
 * If `slice_spec[r[y]]` is a value of type `all_tag`, `m.extent(y) == M.extent(r[y])`.
