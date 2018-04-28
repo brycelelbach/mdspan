@@ -24,7 +24,7 @@ struct layout_right
         template <std::size_t... Pads>
         struct padding
         {
-            // Striding specified, padding specified.
+            // Stepping specified, padding specified.
             template <typename Dims>
             using mapping = layout_mapping_right<
                 Dims
@@ -33,7 +33,7 @@ struct layout_right
             >;
         };
 
-        // Striding specified, padding defaulted.
+        // Stepping specified, padding defaulted.
         template <typename Dims>
         using mapping = layout_mapping_right<
             Dims
@@ -48,7 +48,7 @@ struct layout_right
         template <std::size_t... Steps>
         struct stepping
         {
-            // Striding specified, padding specified.
+            // Stepping specified, padding specified.
             template <typename Dims>
             using mapping = layout_mapping_right<
                 Dims
@@ -57,7 +57,7 @@ struct layout_right
             >;
         };
 
-        // Striding defaulted, padding specified.
+        // Stepping defaulted, padding specified.
         template <typename Dims>
         using mapping = layout_mapping_right<
             Dims
@@ -66,7 +66,7 @@ struct layout_right
         >;
     };
 
-    // Striding defaulted, padding defaulted.
+    // Stepping defaulted, padding defaulted.
     template <typename Dims>
     using mapping = layout_mapping_right<
         Dims

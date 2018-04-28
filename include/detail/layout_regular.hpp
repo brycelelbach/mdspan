@@ -28,7 +28,7 @@ struct layout_regular_impl
         template <std::size_t... Pads>
         struct padding
         {
-            // Striding specified, padding specified.
+            // Stepping specified, padding specified.
             template <typename Dimensions>
             using mapping = LayoutMappingRegular<
                 Dimensions
@@ -38,7 +38,7 @@ struct layout_regular_impl
             >;
         };
 
-        // Striding specified, padding defaulted.
+        // Stepping specified, padding defaulted.
         template <typename Dimensions>
         using mapping = LayoutMappingRegular<
             Dimensions
@@ -54,7 +54,7 @@ struct layout_regular_impl
         template <std::size_t... Steps>
         struct stepping
         {
-            // Striding specified, padding specified.
+            // Stepping specified, padding specified.
             template <typename Dimensions>
             using mapping = LayoutMappingRegular<
                 Dimensions
@@ -64,7 +64,7 @@ struct layout_regular_impl
             >;
         };
 
-        // Striding defaulted, padding specified.
+        // Stepping defaulted, padding specified.
         template <typename Dimensions>
         using mapping = LayoutMappingRegular<
             Dimensions
@@ -74,7 +74,7 @@ struct layout_regular_impl
         >;
     };
 
-    // Striding defaulted, padding defaulted.
+    // Stepping defaulted, padding defaulted.
     template <typename Dimensions>
     using mapping = LayoutMappingRegular<
         Dimensions
